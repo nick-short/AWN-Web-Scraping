@@ -57,8 +57,8 @@ hits_data <- count_data(first_month, first_year, last_month, last_year)
 sample_text <- list()
 
 ## Enter Stanford login information
-usr <- "nshort"
-pwd <- "Inv!sibl3Bridge"
+usr <- ""
+pwd <- ""
 
 ## Initiate automated Google Chrome window ("remDr")
 driver<- rsDriver()
