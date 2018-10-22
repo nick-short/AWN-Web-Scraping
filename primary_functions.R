@@ -133,10 +133,18 @@ get_snippets <- function(num){
   rpp <- 10 # Define number of results per page
   
   # Re-sort so that the best matches are displayed first
+  sort_dropdown <- remDr$findElement(using='css selector', "#result-sort")
+  sort_dropdown$clickElement()
   
+  relevant_first <- remDr$findElement(using = 'xpath', value = '//*[@id="resultsort-_rank_D"]')
+  relevant_first$clickElement()
   
   # Change page options to display 50 result per page
+  num_results_dropdown <- remDr$findElement(using='id', value="display-options")
+  num_results_dropdown$clickElement()
   
+  fifty_results <- remDr$findElement(using = 'xpath', '//*[@id="change-results-per-page-50"]')
+  fifty_results$clickElement()
   
   # If there are rpp or less results then simply take text snippets from the
   # num results; otherwise iterate through each page

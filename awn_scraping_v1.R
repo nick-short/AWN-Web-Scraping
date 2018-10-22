@@ -44,7 +44,7 @@ word_string <- make_string(words)
 ## Define first month and year and last month and year of search queries
 first_month <- "Jan"
 first_year <- 2018
-last_month <- "Aug"
+last_month <- "Sep"
 last_year <- 2018
 
 ## Construct search term URLs (urls) for all dates and baseline urls (base_urls)
@@ -80,6 +80,7 @@ if (grepl("login.stanford.edu", current_url)){twofa_login(usr,pwd)}
 ## results, but for now let's just execute 9 blocks of code.
 start <- Sys.time()
 query_results1 <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 10)
+hits <- query_results1[[1]]
 fin <- Sys.time()
 fin - start
 
@@ -117,7 +118,7 @@ library(ggplot2)
 hits$date <- as.yearmon(hits$date, "%d%b%Y")
 hits$prop <- hits$count / baseline_results$count
 baseline_results$count_ma <- NA
-ma_window <- 13 # Length of 
+ma_window <- 13 # Length of rolling mean spread
 baseline_results$count_ma[ma_window:(nrow(baseline_results) - ma_window + 1)] <- rollmean(baseline_results$count, ma_window)
 hits$prop_ma <- hits$count / baseline_results$count_ma
 
@@ -132,4 +133,4 @@ p <- ggplot(hits) + xlab("Time") + ylab("Proportion of Results") +
   scale_color_manual(name = "Type of Proportion", 
                      values = c(Yearly_Moving_Average = "red", 
                                 Standard_Monthly_Proportion = "dark blue"))
-
+p
