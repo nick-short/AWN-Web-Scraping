@@ -4,7 +4,6 @@
 
 rm(list = ls()) # Clear the workspace
 
-
           ## Libraries.  Note: we should probably use packrat for version control
 
 
@@ -24,7 +23,7 @@ library(RSelenium)
 #library(stringi) # Do we actually use this?
 library(stringr) # We use str_split() and and str_replace() in get_number()
 library(profvis) # We use pause()
-
+library(tidyverse)
 
           ## Source Primary Functions
 
