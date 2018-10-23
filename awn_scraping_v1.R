@@ -42,7 +42,7 @@ words <- format_words(words)
 word_string <- make_string(words)
 
 ## Define first month and year and last month and year of search queries
-first_month <- "Jan"
+first_month <- "Aug"
 first_year <- 2018
 last_month <- "Sep"
 last_year <- 2018
@@ -79,7 +79,7 @@ if (grepl("login.stanford.edu", current_url)){twofa_login(usr,pwd)}
 ## loop on execute_queries for each set of search terms and then combines the
 ## results, but for now let's just execute 9 blocks of code.
 start <- Sys.time()
-query_results1 <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 10)
+query_results1 <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 50)
 hits <- query_results1[[1]]
 fin <- Sys.time()
 fin - start

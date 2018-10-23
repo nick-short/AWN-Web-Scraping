@@ -114,7 +114,7 @@ get_number <- function(){
   # number, is the fourth word. Extract Y, then remove commas and convert to
   # numeric format
   num <- unlist(str_split(text_num, " "))[4]
-  num <- as.numeric(str_replace(num, ",", ""))
+  num <- as.numeric(str_remove_all(num, ","))
   return(num)
 }
 
@@ -122,15 +122,15 @@ get_number <- function(){
 # This function assumes we are on the first page of search query.  It will
 # re-sort the data so that the best matches, rather than the most recent
 # matches, are displayed first.  It will then change the page options so that
-# 50, rather than 10, results are displayed on each page.  It will then retrieve
-# 'num' text snippets.  If num is greater than 50, the function will
-# sequentially advance the browser page by page and extract the text snippets
-# shown on each page.
+# 50, rather than 10, results are displayed on each page.  It will
+# then retrieve 'num' text snippets.  If num is greater than rpp, the function
+# will sequentially advance the browser page by page and extract the text
+# snippets shown on each page.
 
 get_snippets <- function(num){
   snippets <- rep(NA, num)
   count <- 1
-  rpp <- 10 # Define number of results per page
+  rpp <- 50 # Define number of results per page
   
   # Re-sort so that the best matches are displayed first
   sort_dropdown <- remDr$findElement(using='css selector', "#result-sort")
@@ -219,7 +219,7 @@ execute_queries <- function(url_vector, hits, text_list = NULL, nsnip = NULL){
     # We need a try-catch here in case there are no search results. 
     tryCatch({
       
-      # Scrape number of hits and, if 'text' is passed to function, scrape snippets too
+      # Scrape number of hits and, if 'text_list' is passed to function, scrape snippets too
       hits$count[i] <- get_number()
       if (!is.null(text_list)){
         
@@ -243,6 +243,6 @@ execute_queries <- function(url_vector, hits, text_list = NULL, nsnip = NULL){
     
   }
   
-  if(is.null(text_list)){result <- hits} else{result <- list(hits,text)}
+  if(is.null(text_list)){result <- hits} else{result <- list(hits,text_list)}
   return(result)
 }
