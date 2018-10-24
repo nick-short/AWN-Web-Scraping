@@ -210,7 +210,7 @@ get_snippets <- function(num, tot_results){
 ## with the 'hits' data frame as the first element and the list of snippets as
 ## the second element will be returned.
 
-execute_queries <- function(url_vector, hits, text_list, nsnip){
+execute_queries <- function(url_vector, hits, text_list = NULL, nsnip = NULL){
   
   for(i in 1:length(url_vector)) {
     
