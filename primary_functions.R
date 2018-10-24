@@ -129,7 +129,7 @@ get_number <- function(){
 
 get_snippets <- function(num, tot_results){
   cap <- min(num, tot_results, na.rm = TRUE)
-  snippets <- rep(NA, num)
+  snippets <- rep(NA, cap)
   count <- 1
   rpp <- 50 # Define number of results per page
   
