@@ -127,7 +127,8 @@ get_number <- function(){
 # will sequentially advance the browser page by page and extract the text
 # snippets shown on each page.
 
-get_snippets <- function(num){
+get_snippets <- function(num, tot_results){
+  cap <- min(num, tot_results, na.rm = TRUE)
   snippets <- rep(NA, num)
   count <- 1
   rpp <- 50 # Define number of results per page
@@ -149,9 +150,9 @@ get_snippets <- function(num){
   # If there are rpp or less results then simply take text snippets from the
   # num results; otherwise iterate through each page
   
-  if (num <= rpp) {
+  if (cap <= rpp) {
     
-    for(j in 1:num) {
+    for(j in 1:cap) {
       css <- paste("li:nth-child(", j, ") .preview", sep = "")
       text_box <- remDr$findElement(using = 'css selector', css)
       text_snippet <- as.character(text_box$getElementText())
@@ -220,12 +221,13 @@ execute_queries <- function(url_vector, hits, text_list = NULL, nsnip = NULL){
     tryCatch({
       
       # Scrape number of hits and, if 'text_list' is passed to function, scrape snippets too
-      hits$count[i] <- get_number()
+      tot_results <- get_number()
+      hits$count[i] <- tot_results
       if (!is.null(text_list)){
         
         # If nsnip is not specified, set to total number of hits
         if (is.null(nsnip)){nsnip <- hits$count[i]} 
-        text_list[[i]] <- get_snippets(nsnip)
+        text_list[[i]] <- get_snippets(nsnip, tot_results)
         }
       
     }, error = function(e) {

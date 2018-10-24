@@ -92,6 +92,7 @@ baseline_results <- execute_queries(base_urls, hits_data)
 fin <- Sys.time()
 fin - start
 
+### Not sure why you're splitting it up
 ## Search 3: Electric Cars
 words <- c("electric cars", "electric vehicles")
 words <- format_words(words)
