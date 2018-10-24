@@ -42,7 +42,7 @@ generate_urls <- function(beg_month, beg_year, end_month, end_year, search_words
 ## This function will generate a full set of monthly URLS from 'beg_year' to
 ## 'end_year' with no search words (for pulling total counts)
 
-generate_baseline_urls <- function(beg_month, beg_year, end_month, end_year, search_words){
+generate_baseline_urls <- function(beg_month, beg_year, end_month, end_year){
   months <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
   years <- as.character(c(beg_year:end_year))
   

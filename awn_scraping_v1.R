@@ -37,20 +37,20 @@ source('primary_functions.R')
 
 ## Create a vector of key search and ensure that entries with multiple words are
 ## in the proper format for constructing URLs
-words <- c("driverless car", "autonomous vehicle", "self-driving")
+words <- c("driverless", "autonomous car", "self-driving car")
 words <- format_words(words)
 word_string <- make_string(words)
 
 ## Define first month and year and last month and year of search queries
-first_month <- "Aug"
-first_year <- 2018
+first_month <- "Jan"
+first_year <- 1980
 last_month <- "Sep"
 last_year <- 2018
 
 ## Construct search term URLs (urls) for all dates and baseline urls (base_urls)
 ## for determining total number of stories (with no search terms)
 urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
-base_urls <- generate_baseline_urls(first_month, first_year, last_month, last_year, word_string)
+base_urls <- generate_baseline_urls(first_month, first_year, last_month, last_year)
 
 ## Initialize variables for storing data
 hits_data <- count_data(first_month, first_year, last_month, last_year)
@@ -79,11 +79,10 @@ if (grepl("login.stanford.edu", current_url)){twofa_login(usr,pwd)}
 ## loop on execute_queries for each set of search terms and then combines the
 ## results, but for now let's just execute 9 blocks of code.
 start <- Sys.time()
-query_results1 <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 50)
-hits <- query_results1[[1]]
-snippets <- query_results1[[2]]
+autonomous_cars <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 50)
 fin <- Sys.time()
 fin - start
+save(autonomous_cars, file = 'autonomous_cars.RData')
 
 ## Do the same for the baseline URLs, for normalization.  The reason for doing
 ## this separately is that it only needs to be executed once, as the raw monthly
@@ -93,6 +92,17 @@ start <- Sys.time()
 baseline_results <- execute_queries(base_urls, hits_data)
 fin <- Sys.time()
 fin - start
+
+## Search 3: Electric Cars
+words <- c("electric cars", "electric vehicles")
+words <- format_words(words)
+word_string <- make_string(words)
+
+urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
+hits_data <- count_data(first_month, first_year, last_month, last_year)
+sample_text <- list()
+electric_cars <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 50)
+save(electric_cars, file = 'electric_cars.RData')
 
 ## Close the automated Chrome window
 remDr$close()
