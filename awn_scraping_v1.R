@@ -81,6 +81,7 @@ if (grepl("login.stanford.edu", current_url)){twofa_login(usr,pwd)}
 start <- Sys.time()
 query_results1 <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 50)
 hits <- query_results1[[1]]
+snippets <- query_results1[[2]]
 fin <- Sys.time()
 fin - start
 
