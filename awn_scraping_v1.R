@@ -121,6 +121,19 @@ fin <- Sys.time()
 fin - start
 save(cloud_computing, file = 'cloud_computing.RData')
 
+## Search 6: Smartphones
+words <- c("smartphone","smart phone", "iPhone")
+words <- format_words(words)
+word_string <- make_string(words)
+
+urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
+hits_data <- count_data(first_month, first_year, last_month, last_year)
+sample_text <- list()
+start <- Sys.time()
+smartphones <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 50)
+fin <- Sys.time()
+fin - start
+save(smartphones, file = 'smartphones.RData')
 ## Close the automated Chrome window
 remDr$close()
 
