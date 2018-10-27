@@ -101,8 +101,25 @@ word_string <- make_string(words)
 urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
 hits_data <- count_data(first_month, first_year, last_month, last_year)
 sample_text <- list()
+start <- Sys.time()
 electric_cars <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 50)
+fin <- Sys.time()
+fin - start
 save(electric_cars, file = 'electric_cars.RData')
+
+## Search 4: Cloud Computing
+words <- c("cloud computing")
+words <- format_words(words)
+word_string <- make_string(words)
+
+urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
+hits_data <- count_data(first_month, first_year, last_month, last_year)
+sample_text <- list()
+start <- Sys.time()
+cloud_computing <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 50)
+fin <- Sys.time()
+fin - start
+save(cloud_computing, file = 'cloud_computing.RData')
 
 ## Close the automated Chrome window
 remDr$close()
