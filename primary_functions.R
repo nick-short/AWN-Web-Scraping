@@ -107,14 +107,20 @@ twofa_login <- function(username, password){
 get_number <- function(){
   
   # Determine the number of search results and assign it to the variable "num"
-  text_line <- remDr$findElement(using = 'css selector', ".nb-showing-result-count")
-  text_num <- as.character(text_line$getElementText())
+  num <- tryCatch({
+    suppressMessages({
+      text_line <- remDr$findElement(using = 'css selector', ".nb-showing-result-count")
+      text_num <- as.character(text_line$getElementText())
   
-  # Text takes the form of "Showing 1-X of Y Results" where Y, the desired
-  # number, is the fourth word. Extract Y, then remove commas and convert to
-  # numeric format
-  num <- unlist(str_split(text_num, " "))[4]
-  num <- as.numeric(str_remove_all(num, ","))
+      # Text takes the form of "Showing 1-X of Y Results" where Y, the desired
+      # number, is the fourth word. Extract Y, then remove commas and convert to
+      # numeric format
+      num <- unlist(str_split(text_num, " "))[4]
+      num <- as.numeric(str_remove_all(num, ","))
+      num
+    })
+    }, error = function(e) {0}
+  )
   return(num)
 }
 
@@ -210,47 +216,48 @@ get_snippets <- function(num, tot_results){
 ## with the 'hits' data frame as the first element and the list of snippets as
 ## the second element will be returned.
 
-execute_queries <- function(url_vector, file, text_list = NULL, nsnip = NULL){
+execute_queries <- function(file, nsnip = NULL){
   
-  load(file) # Load the file where results are to be written (must contain hits dataframe; can also contain sample_text list)
-  index <- min(which(is.na(hits$count))) # Identify the first NA in hits_data$count
-  # If there are no results written, start at the first row; otherwise, start
-  # one row prior to the last recorded count result
+  # Load the file where results are to be written.  This file must contain a
+  # 'hits' dataframe and a 'urls' vector.  It can also contain a 'snippets' list.
+  load(file = file)
+  
+  # Identify the first NA in hits$count.  If there are no results written (index
+  # == 1), start at the first row / URL; otherwise, start one row prior to the
+  # last recorded count result
+  index <- min(which(is.na(hits$count))) 
   if(index == 1){start <- 1} else{start <- (index - 1)}
   
-  for(i in start:length(url_vector)) {
+  for(i in start:length(urls)) {
     
     # Navigate to the URL
-    remDr$navigate(url_vector[i])
+    remDr$navigate(urls[i])
     
-    # We need a try-catch here in case there are no search results. 
-    tryCatch({
+    # Scrape number of hits 
+    tot_results <- get_number()
+    hits$count[i] <- tot_results
+  
+    # If 'snippets' is included in 'file', scrape snippets too      
+    if (exists("snippets")){
       
-      # Scrape number of hits and, if 'text_list' is passed to function, scrape snippets too
-      tot_results <- get_number()
-      hits$count[i] <- tot_results
-      if (!is.null(text_list)){
+      if (tot_results > 0){ # If total results is positive, scrape
         
-        # If nsnip is not specified, set to total number of hits
-        if (is.null(nsnip)){nsnip <- hits$count[i]} 
-        text_list[[i]] <- get_snippets(nsnip, tot_results)
-        }
-      
-    }, error = function(e) {
-      
-      # Otherwise set to 0 and NA respectively
-      hits$count[i] <- 0
-      if(!is.null(text_list)){text_list[[i]] <- "NA"}
-      
-    })
+        if (is.null(nsnip)){nsnip <- tot_results} # If nsnip is not specified, set to total number of hits
+          snippets[[i]] <- get_snippets(nsnip, tot_results)
+          } else {snippets[[i]] <- NA} # Otherwise, set to NA
+      }
+    
+    
+    # Every tenth observation, and on the last observation, save results
+    if ((i %% 10 == 0) | i == length(urls)){
+      if (exists("snippets")){save(urls, hits, snippets, file = file)} else{save(urls, hits, file = file)}
+    }
     
     # Pause before submitting another query.  At the moment, the pause is normally
     # distributed around 30 seconds, with a SD of 5 seconds.
     
-    pause(abs(rnorm(1,30,5)))
+    pause(abs(rnorm(1,30,3)))
     
   }
   
-  if(is.null(text_list)){result <- hits} else{result <- list(hits,text_list)}
-  return(result)
 }

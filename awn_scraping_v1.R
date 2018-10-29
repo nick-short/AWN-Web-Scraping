@@ -57,7 +57,7 @@ if (grepl("login.stanford.edu", current_url)){twofa_login(usr,pwd)}
 
 ## Define first month and year and last month and year of search queries
 first_month <- "Jan"
-first_year <- 1980
+first_year <- 1985
 last_month <- "Sep"
 last_year <- 2018
 
@@ -67,6 +67,7 @@ last_year <- 2018
 ## loop on execute_queries for each set of search terms and then combines the
 ## results, but for now let's just execute 9 blocks of code.
 
+# Search 1: Autonomous Cars
 ## Create a vector of key search and ensure that entries with multiple words are
 ## in the proper format for constructing URLs
 words <- c("driverless", "autonomous car", "self-driving car")
@@ -74,20 +75,26 @@ words <- format_words(words)
 word_string <- make_string(words)
 
 ## Initialize variables for storing data
-hits_data <- count_data(first_month, first_year, last_month, last_year)
-sample_text <- list()
+urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
+hits <- count_data(first_month, first_year, last_month, last_year)
+snippets <- list()
+save(urls, hits, snippets, file = "autonomous_cars.RData")
+
 start <- Sys.time()
-autonomous_cars <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 50)
+execute_queries(file = "autonomous_cars.RData", nsnip = 50)
 fin <- Sys.time()
 fin - start
-save(autonomous_cars, file = 'autonomous_cars.RData')
 
 ## Do the same for the baseline URLs, for normalization.  The reason for doing
 ## this separately is that it only needs to be executed once, as the raw monthly
 ## numbers will be the same (they do not contain search terms and will not vary
 ## by search terms).
+urls <- generate_baseline_urls(first_month, first_year, last_month, last_year, word_string)
+hits <- count_data(first_month, first_year, last_month, last_year)
+save(urls, hits, file = "baseline.RData")
+
 start <- Sys.time()
-baseline_results <- execute_queries(base_urls, hits_data)
+execute_queries(file = "baseline.RData")
 fin <- Sys.time()
 fin - start
 
@@ -98,13 +105,15 @@ words <- format_words(words)
 word_string <- make_string(words)
 
 urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
-hits_data <- count_data(first_month, first_year, last_month, last_year)
-sample_text <- list()
+hits <- count_data(first_month, first_year, last_month, last_year)
+snippets <- list()
+save(urls, hits, snippets, file = "electric_cars.RData")
+
 start <- Sys.time()
-electric_cars <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 50)
+execute_queries(file = "electric_cars.RData", nsnip = 50)
 fin <- Sys.time()
 fin - start
-save(electric_cars, file = 'electric_cars.RData')
+
 
 ## Search 4: Cloud Computing
 words <- c("cloud computing")
@@ -112,13 +121,14 @@ words <- format_words(words)
 word_string <- make_string(words)
 
 urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
-hits_data <- count_data(first_month, first_year, last_month, last_year)
-sample_text <- list()
+hits <- count_data(first_month, first_year, last_month, last_year)
+snippets <- list()
+save(urls, hits, snippets, file = "cloud_computing.RData")
+
 start <- Sys.time()
-cloud_computing <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 50)
+execute_queries(file = "cloud_computing.RData", nsnip = 50)
 fin <- Sys.time()
 fin - start
-save(cloud_computing, file = 'cloud_computing.RData')
 
 ## Search 6: Smartphones
 words <- c("smartphone","smart phone", "iPhone")
@@ -126,15 +136,15 @@ words <- format_words(words)
 word_string <- make_string(words)
 
 urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
-hits_data <- count_data(first_month, first_year, last_month, last_year)
-sample_text <- list()
-save(urls, hits_data, sample_text, file = "smartphones.RData")
+hits <- count_data(first_month, first_year, last_month, last_year)
+snippets <- list()
+save(urls, hits, snippets, file = "smartphones.RData")
 
 start <- Sys.time()
-smartphones <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 50)
+execute_queries(file = "smartphones.RData", nsnip = 50)
 fin <- Sys.time()
 fin - start
-save(smartphones, file = 'smartphones.RData')
+
 
 ## Close the automated Chrome window
 remDr$close()
