@@ -65,9 +65,10 @@ last_year <- 2018
 ## Load each URL and scrape the number of hits plus text snippets (get_snippets
 ## = sample_text).  Note: we will eventually want a function that runs a for
 ## loop on execute_queries for each set of search terms and then combines the
-## results, but for now let's just execute 9 blocks of code.
+## results, but for now let's just execute several blocks of code.
 
-# Search 1: Autonomous Cars
+
+## Search 2: Autonomous Cars
 ## Create a vector of key search and ensure that entries with multiple words are
 ## in the proper format for constructing URLs
 words <- c("driverless", "autonomous car", "self-driving car")
@@ -85,10 +86,8 @@ execute_queries(file = "autonomous_cars.RData", nsnip = 50)
 fin <- Sys.time()
 fin - start
 
-## Do the same for the baseline URLs, for normalization.  The reason for doing
-## this separately is that it only needs to be executed once, as the raw monthly
-## numbers will be the same (they do not contain search terms and will not vary
-## by search terms).
+
+## Search 0: Baseline (for normalization)
 urls <- generate_baseline_urls(first_month, first_year, last_month, last_year, word_string)
 hits <- count_data(first_month, first_year, last_month, last_year)
 save(urls, hits, file = "baseline.RData")
@@ -130,6 +129,22 @@ execute_queries(file = "cloud_computing.RData", nsnip = 50)
 fin <- Sys.time()
 fin - start
 
+## Search 5: Solar Tech
+words <- c("solar panels","solar cells","solar electricity")
+words <- format_words(words)
+word_string <- make_string(words)
+
+urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
+hits <- count_data(first_month, first_year, last_month, last_year)
+snippets <- list()
+save(urls, hits, snippets, file = "solar_tech.RData")
+
+start <- Sys.time()
+execute_queries(file = "solar_tech.RData", nsnip = 50)
+fin <- Sys.time()
+fin - start
+
+
 ## Search 6: Smartphones
 words <- c("smartphone","smart phone", "iPhone")
 words <- format_words(words)
@@ -145,6 +160,21 @@ execute_queries(file = "smartphones.RData", nsnip = 50)
 fin <- Sys.time()
 fin - start
 
+
+## Search 7: 3D Printing
+words <- c("3D printing","additive manufacturing")
+words <- format_words(words)
+word_string <- make_string(words)
+
+urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
+hits <- count_data(first_month, first_year, last_month, last_year)
+snippets <- list()
+save(urls, hits, snippets, file = "3D_printing.RData")
+
+start <- Sys.time()
+execute_queries(file = "3D_printing.RData", nsnip = 50)
+fin <- Sys.time()
+fin - start
 
 ## Close the automated Chrome window
 remDr$close()
