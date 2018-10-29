@@ -210,9 +210,15 @@ get_snippets <- function(num, tot_results){
 ## with the 'hits' data frame as the first element and the list of snippets as
 ## the second element will be returned.
 
-execute_queries <- function(url_vector, hits, text_list = NULL, nsnip = NULL){
+execute_queries <- function(url_vector, file, text_list = NULL, nsnip = NULL){
   
-  for(i in 1:length(url_vector)) {
+  load(file) # Load the file where results are to be written (must contain hits dataframe; can also contain sample_text list)
+  index <- min(which(is.na(hits$count))) # Identify the first NA in hits_data$count
+  # If there are no results written, start at the first row; otherwise, start
+  # one row prior to the last recorded count result
+  if(index == 1){start <- 1} else{start <- (index - 1)}
+  
+  for(i in start:length(url_vector)) {
     
     # Navigate to the URL
     remDr$navigate(url_vector[i])

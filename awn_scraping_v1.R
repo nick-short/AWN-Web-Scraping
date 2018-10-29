@@ -34,26 +34,8 @@ source('primary_functions.R')
           ## Execute Web Scraping
 
 
-## Create a vector of key search and ensure that entries with multiple words are
-## in the proper format for constructing URLs
-words <- c("driverless", "autonomous car", "self-driving car")
-words <- format_words(words)
-word_string <- make_string(words)
-
-## Define first month and year and last month and year of search queries
-first_month <- "Jan"
-first_year <- 1980
-last_month <- "Sep"
-last_year <- 2018
-
-## Construct search term URLs (urls) for all dates and baseline urls (base_urls)
-## for determining total number of stories (with no search terms)
-urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
-base_urls <- generate_baseline_urls(first_month, first_year, last_month, last_year)
-
-## Initialize variables for storing data
-hits_data <- count_data(first_month, first_year, last_month, last_year)
-sample_text <- list()
+## Define a test URL that will be used to initiate session
+test_url <- "https://infoweb-newsbank-com.stanford.idm.oclc.org/resources/search/nb?p=AWNB&b=results&action=search&fld0=YMD_date&val0=Jan+1980&bln1=AND&fld1=YMD_date&val1=&sort=YMD_date%3AD"
 
 ## Enter Stanford login information
 usr <- ""
@@ -64,7 +46,7 @@ driver<- rsDriver()
 remDr <- driver[["client"]]
 
 ## Try to navigates to the first URL
-remDr$navigate(urls[1])
+remDr$navigate(test_url)
 
 ## If this re-directs to login.stanford.edu, enter two-factor authorization info
 ## (DUO push still not enabled)
@@ -73,10 +55,27 @@ if (grepl("login.stanford.edu", current_url)){twofa_login(usr,pwd)}
 
 ## You have to pause here to resolve duo push if needed.
 
+## Define first month and year and last month and year of search queries
+first_month <- "Jan"
+first_year <- 1980
+last_month <- "Sep"
+last_year <- 2018
+
+
 ## Load each URL and scrape the number of hits plus text snippets (get_snippets
 ## = sample_text).  Note: we will eventually want a function that runs a for
 ## loop on execute_queries for each set of search terms and then combines the
 ## results, but for now let's just execute 9 blocks of code.
+
+## Create a vector of key search and ensure that entries with multiple words are
+## in the proper format for constructing URLs
+words <- c("driverless", "autonomous car", "self-driving car")
+words <- format_words(words)
+word_string <- make_string(words)
+
+## Initialize variables for storing data
+hits_data <- count_data(first_month, first_year, last_month, last_year)
+sample_text <- list()
 start <- Sys.time()
 autonomous_cars <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 50)
 fin <- Sys.time()
@@ -129,11 +128,14 @@ word_string <- make_string(words)
 urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
 hits_data <- count_data(first_month, first_year, last_month, last_year)
 sample_text <- list()
+save(urls, hits_data, sample_text, file = "smartphones.RData")
+
 start <- Sys.time()
 smartphones <- execute_queries(urls, hits_data, text_list = sample_text, nsnip = 50)
 fin <- Sys.time()
 fin - start
 save(smartphones, file = 'smartphones.RData')
+
 ## Close the automated Chrome window
 remDr$close()
 
