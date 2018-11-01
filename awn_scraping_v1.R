@@ -64,7 +64,7 @@ get_awn_session()
 ## of snippets to be returned, or the function will only scrape hits.
 execute_queries(file = "autonomous_cars.RData", nsnip = 50)
 execute_queries(file = "electric_cars.RData", nsnip = 50)
-
+execute_queries(file = "cloud_computing.RData", nsnip = 50)
 execute_queries(file = "smartphones.RData", nsnip = 50)
 execute_queries(file = "3D_printing.RData", nsnip = 50)
 
@@ -86,35 +86,17 @@ execute_queries(file = "baseline.RData")
 
 
 
-## Search 4: Cloud Computing
-words <- c("cloud computing")
+
+words <- c("electric cars", "electric vehicles")
 words <- format_words(words)
 word_string <- make_string(words)
 
-urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
-hits <- count_data(first_month, first_year, last_month, last_year)
+urls <- generate_urls("Jan", 1985, "Sep", 2018, word_string)
+hits <- count_data("Jan", 1985, "Sep", 2018)
 snippets <- list()
 save(urls, hits, snippets, file = "cloud_computing.RData")
 
-start <- Sys.time()
-execute_queries(file = "cloud_computing.RData", nsnip = 50)
-fin <- Sys.time()
-fin - start
 
-## Search 5: Solar Tech
-words <- c("solar panels","solar cells","solar electricity")
-words <- format_words(words)
-word_string <- make_string(words)
-
-urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
-hits <- count_data(first_month, first_year, last_month, last_year)
-snippets <- list()
-save(urls, hits, snippets, file = "solar_tech.RData")
-
-start <- Sys.time()
-execute_queries(file = "solar_tech.RData", nsnip = 50)
-fin <- Sys.time()
-fin - start
 
 
 
