@@ -131,7 +131,7 @@ generate_datafiles <- function(words, files, nsnip = NULL, first_month = NULL, f
   
   ## Set default values if not passed to function
   if(is.null(first_month)){first_month = "Jan"}
-  if(is.null(last_month)){last_month = "Dec"}
+  if(is.null(last_month)){last_month = "Sep"}
   if(is.null(first_year)){first_year = 1985}
   if(is.null(last_year)){last_year = 2018}
   
@@ -150,6 +150,15 @@ generate_datafiles <- function(words, files, nsnip = NULL, first_month = NULL, f
       save(urls, hits, snippets, file = files[j])
     }
   }
+}
+
+## This function will simply return a vector of n (up to 240) bi-grams used for
+## testing implementation time
+
+generate_test_terms <- function(n){
+  if(n > 240) stop("n must be less than 240")
+  load(file = "test_terms.RData")
+  return(terms$bigrams[1:n])
 }
 
 
@@ -273,6 +282,9 @@ execute_queries <- function(file, nsnip = NULL){
   # 'hits' dataframe and a 'urls' vector.  It can also contain a 'snippets' list.
   load(file = file)
   
+  # Set start_time if we are tracking time (if variable "time" exists in the file)
+  if (exists("time")){start_time <- Sys.time()}
+  
   # Identify the first NA in hits$count.  If there are no results written (index
   # == 1), start at the first row / URL; otherwise, start one row prior to the
   # last recorded count result
@@ -298,10 +310,15 @@ execute_queries <- function(file, nsnip = NULL){
           } else {snippets[[i]] <- NA} # Otherwise, set to NA
       }
     
+    # Calculate time differential and reset clock on start_time
+    time[i] <- difftime(Sys.time(), start_time, units = "secs")
+    start_time <- Sys.time()
     
     # Every tenth observation, and on the last observation, save results
     if ((i %% 10 == 0) | i == length(urls)){
-      if (exists("snippets")){save(urls, hits, snippets, file = file)} else{save(urls, hits, file = file)}
+      if (exists("time")){
+        if (exists("snippets")){save(urls, hits, snippets, time, file = file)} else{save(urls, hits, time, file = file)}} else {
+        if (exists("snippets")){save(urls, hits, snippets, file = file)} else{save(urls, hits, file = file)}}
     }
     
     # Pause before submitting another query.  At the moment, the pause is normally
@@ -311,4 +328,37 @@ execute_queries <- function(file, nsnip = NULL){
     
   }
   
+}
+
+## This function will stitch together the hit counts from a list of files that
+## contain dataframe named 'hits', normalize them according to the hits stored
+## in a baseline file if specified and return a dataframe with one column for
+## each group of search terms.  The first file in the list is used to determine
+## the number of rows in the final dataframe, and to pass the vector of dates.
+
+stitch_hits <- function(filelist, basefile = NULL, mvavg_win = NULL){
+  ncols <- length(filelist)
+  load(filelist[[1]])
+  nrows <- nrow(hits)
+  varnames <- str_split(filelist, pattern = fixed("."), simplify = TRUE)[, 1] # Keep everything before period as a variable name
+  results <- data.frame(matrix(data = NA, nrow = nrows, ncol = (ncols + 1)))
+  colnames(results) <- c("date",varnames)
+  results[,1] <- hits$date
+  results[,2] <- hits$count
+  
+  for (j in 3:(ncols+1)){
+    load(filelist[(j-1)])
+    results[,j] = hits$count}
+  
+  if(!is.null(basefile)){
+    load(basefile)
+    if(is.null(mvavg_win)){for (k in 2:(ncols+1)){results[,k] <- results[,k] / hits$count}} else{
+      ## Implement moving average here.  Code below copied/pasted and untested.
+      #baseline_results$count_ma <- NA
+      #ma_window <- 13 # Length of rolling mean spread
+      #baseline_results$count_ma[ma_window:(nrow(baseline_results) - ma_window + 1)] <- rollmean(baseline_results$count, ma_window)
+      #hits$prop_ma <- hits$count / baseline_results$count_ma
+      
+    }
+  }
 }

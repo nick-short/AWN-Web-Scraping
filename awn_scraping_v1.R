@@ -6,7 +6,6 @@ rm(list = ls()) # Clear the workspace
 
           ## Libraries.  Note: we should probably use packrat for version control
 
-
 #Use these commands to install RSelenium if needed.  Note: you have to install a
 #Java development kit to make it run.  See:
 #https://www.oracle.com/technetwork/java/javase/downloads/jdk10-downloads-4416644.html
@@ -23,6 +22,8 @@ library(RSelenium)
 #library(rvest) # We should consider using this in lieu of RSelenium for the queries
 library(stringr) # We use str_split() and and str_replace() in get_number()
 library(profvis) # We use pause()
+library(zoo)
+library(ggplot2)
 
 
           ## Source primary functions
@@ -52,27 +53,21 @@ filenames <- c("autonomous_cars.RData",
 
 generate_datafiles(words = terms, files = filenames, nsnip = 50)
 
-
           ## Initiate AWN session with manual login
 
 get_awn_session()
 #twofa_login() # We currently do not use this; login manually
 
-          ## Execute web scraping
+          ## Execute substantive web scraping
 
 ## Load each data file, and scrape using stored URLs.  Set 'nsnip' to the number
 ## of snippets to be returned, or the function will only scrape hits.
 execute_queries(file = "autonomous_cars.RData", nsnip = 50)
 execute_queries(file = "electric_cars.RData", nsnip = 50)
 execute_queries(file = "cloud_computing.RData", nsnip = 50)
+execute_queries(file = "solar_tech.RData", nsnip = 50)
 execute_queries(file = "smartphones.RData", nsnip = 50)
 execute_queries(file = "3D_printing.RData", nsnip = 50)
-
-
-          ## Close the automated Chrome window
-
-remDr$close()
-
 
 ## Get baseline hits (for normalization) if needed
 urls <- generate_baseline_urls(beg_month = "Jan", beg_year = 1985, end_month = "Sep", end_year = 2018)
@@ -80,53 +75,41 @@ hits <- count_data(first_month, first_year, last_month, last_year)
 save(urls, hits, file = "baseline.RData")
 execute_queries(file = "baseline.RData")
 
+          ## Conduct tests for scraping time if desired
 
+test_terms <- generate_test_terms(n = 20) # n is the number of bi-grams
+generate_datafiles(words = test_terms, files = "testfile_0snip.RData")
+generate_datafiles(words = test_terms, files = "testfile_50snip.RData", nsnip = 50)
+generate_datafiles(words = test_terms, files = "testfile_100snip.RData", nsnip = 100)
 
+test_filenames <- c("testfile_0snip.RData", 
+                    "testfile_50snip.RData",
+                    "testfile_100snip.RData")
+for (j in 1:length(test_filenames)) {
+  load(file = test_filenames[j])
+  time <- vector(mode = "numeric", length = nrow(hits))
+  save(hits, snippets, urls, time, file = test_filenames[j])
+}
 
+execute_queries(file = "testfile_0snip")
+execute_queries(file = "testfile_50snip", nsnip = 50)
+execute_queries(file = "testfile_100snip", nsnip = 100)
 
+          ## Close the automated Chrome window
 
-
-
-words <- c("electric cars", "electric vehicles")
-words <- format_words(words)
-word_string <- make_string(words)
-
-urls <- generate_urls("Jan", 1985, "Sep", 2018, word_string)
-hits <- count_data("Jan", 1985, "Sep", 2018)
-snippets <- list()
-save(urls, hits, snippets, file = "cloud_computing.RData")
-
-
-
-
-
-
-
-
-          ## Save results.
-
-
-## Save results to the current working directory.  Note: we want to think about
-#how to do this in an automated way.  It might be best to run all the queries
-#and then save.image(), or we might want to run them one at a time and save to a .csv.
-#write.csv(query_results1, file = "QueryResultsTable.csv")
-
+remDr$close()
 
           ## Analyze results.
 
+## Stitch the hit data together.  This will handle the  normalization (set the
+## mvavg_win to a numeric for the length of the window in months if you want a
+## moving average of baseline hits).  Data will be in wide format.
+hits <- stitch_hits(filenames, basefile = "baseline.RData")
 
-library(zoo)
-library(ggplot2)
-
-## Shape the data.  Convert dates into year-months.  Calculate hits relative to
-## total news stories (from baseline_results) or a moving average of total results.
+## Shape the data.  Convert dates into year-months.
 
 hits$date <- as.yearmon(hits$date, "%d%b%Y")
-hits$prop <- hits$count / baseline_results$count
-baseline_results$count_ma <- NA
-ma_window <- 13 # Length of rolling mean spread
-baseline_results$count_ma[ma_window:(nrow(baseline_results) - ma_window + 1)] <- rollmean(baseline_results$count, ma_window)
-hits$prop_ma <- hits$count / baseline_results$count_ma
+
 
 # This overlays the plots of the monthly average (blue) and 13-month moving
 # average (red) of the query in question. It is likely that these won't be the
