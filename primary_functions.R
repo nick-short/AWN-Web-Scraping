@@ -91,6 +91,7 @@ get_awn_session <- function(test_url = NULL) {
   driver<- rsDriver()
   remDr <- driver[["client"]]
   remDr$navigate(test_url)
+  return(remDr)
 }
 
 ## This function check if the current URL is at login.stanford.edu, and if it
@@ -311,8 +312,10 @@ execute_queries <- function(file, nsnip = NULL){
       }
     
     # Calculate time differential and reset clock on start_time
-    time[i] <- difftime(Sys.time(), start_time, units = "secs")
-    start_time <- Sys.time()
+    if (exists("time")){
+      time[i] <- difftime(Sys.time(), start_time, units = "secs")
+      start_time <- Sys.time()
+    }
     
     # Every tenth observation, and on the last observation, save results
     if ((i %% 10 == 0) | i == length(urls)){

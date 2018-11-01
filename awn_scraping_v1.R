@@ -55,7 +55,8 @@ generate_datafiles(words = terms, files = filenames, nsnip = 50)
 
           ## Initiate AWN session with manual login
 
-get_awn_session()
+
+remDr <- get_awn_session()
 #twofa_login() # We currently do not use this; login manually
 
           ## Execute substantive web scraping
