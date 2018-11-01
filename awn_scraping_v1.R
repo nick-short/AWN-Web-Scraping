@@ -88,8 +88,8 @@ test_filenames <- c("testfile_0snip.RData",
                     "testfile_100snip.RData")
 for (j in 1:length(test_filenames)) {
   load(file = test_filenames[j])
-  time <- vector(mode = "numeric", length = nrow(hits))
-  save(hits, snippets, urls, time, file = test_filenames[j])
+  timestamps <- vector(mode = "numeric", length = nrow(hits))
+  save(hits, snippets, urls, timestamps, file = test_filenames[j])
 }
 
 execute_queries(file = "testfile_0snip")
