@@ -84,23 +84,74 @@ count_data <- function(beg_month, beg_year, end_month, end_year){
   count_df <- data.frame(date = all_dates, count = rep(NA, length(all_dates)))
 }
 
-## This function well enter your username and password and advance the browser
-## through the first stage of two-factor authentication.  Right now you have to
-## manually pass the second stage.
+## This function will initiate a session with the AWN website using a test URL
+
+get_awn_session <- function(test_url = NULL) {
+  if(is.null(test_url)){test_url <- "https://infoweb-newsbank-com.stanford.idm.oclc.org/resources/search/nb?p=AWNB&b=results&action=search&fld0=YMD_date&val0=Jan+1980&bln1=AND&fld1=YMD_date&val1=&sort=YMD_date%3AD"}
+  driver<- rsDriver()
+  remDr <- driver[["client"]]
+  remDr$navigate(test_url)
+}
+
+## This function check if the current URL is at login.stanford.edu, and if it
+## is, it will enter your username and password and advance the browser through
+## the first stage of two-factor authentication.  Right now you have to manually
+## pass the second stage (with a duo push, for example).  We do not use this
+## function at the moment because the code is on a public repository on github
+## and we do not want usernames and passwords stored there.
 
 twofa_login <- function(username, password){
   
-  username_box <- remDr$findElement(using = 'css selector', "#username")
-  username_box$sendKeysToElement(list(username))
   
-  password_box <- remDr$findElement(using = 'css selector', "#password")
-  password_box$sendKeysToElement(list(password))
+  current_url <- unlist(remDr$getCurrentUrl())
+  if (grepl("login.stanford.edu", current_url)){
   
-  login_button <- remDr$findElement(using = 'css selector', ".submit-button")
-  login_button$clickElement()
-  
-  # Need a line for the DUO push too (if that page pops up); for now enter manually
+    username_box <- remDr$findElement(using = 'css selector', "#username")
+    username_box$sendKeysToElement(list(username))
+    
+    password_box <- remDr$findElement(using = 'css selector', "#password")
+    password_box$sendKeysToElement(list(password))
+    
+    login_button <- remDr$findElement(using = 'css selector', ".submit-button")
+    login_button$clickElement()
+    
+    # Need a line for the DUO push too (if that page pops up); for now enter manually
+  }
 }
+
+## This function will take a list of search terms and a vector data file names,
+## and it will generate .RData files for storing results.  Note: this function
+## needs to be tested.
+
+generate_datafiles <- function(words, files, nsnip = NULL, first_month = NULL, first_year = NULL, last_month = NULL, last_year = NULL){
+  
+  words_len <- length(words)
+  files_len <- length(files)
+  try(if(words_len == files_len) stop("Word list and file vector have different lengths."))
+  
+  ## Set default values if not passed to function
+  if(is.null(first_month)){first_month = "Jan"}
+  if(is.null(last_month)){last_month = "Dec"}
+  if(is.null(first_year)){first_year = 1985}
+  if(is.null(last_year)){last_year = 2018}
+  
+  for (j in 1:words_len){
+    
+    ## Format words and create single string of search terms
+    word_vec <- format_words(words[[j]])
+    word_string <- make_string(word_vec)
+    
+    ## Initialize variables for storing data
+    urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
+    hits <- count_data(first_month, first_year, last_month, last_year)
+    
+    if(is.null(nsnip)){save(urls, hits, file = files[j])} else{
+      snippets <- list()
+      save(urls, hits, snippets, file = files[j])
+    }
+  }
+}
+
 
 ## This function will retrieve the number of search results
 
@@ -256,7 +307,7 @@ execute_queries <- function(file, nsnip = NULL){
     # Pause before submitting another query.  At the moment, the pause is normally
     # distributed around 30 seconds, with a SD of 5 seconds.
     
-    pause(abs(rnorm(1,30,3)))
+    pause(abs(rnorm(1,30,5)))
     
   }
   

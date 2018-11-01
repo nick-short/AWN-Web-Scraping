@@ -17,101 +17,73 @@ rm(list = ls()) # Clear the workspace
 #"https://cran.uni-muenster.de/") install_version("RSelenium", version =
 #"1.7.1", repos = "https://cran.uni-muenster.de/")
 
+library(tidyverse)
 library(readr)
 library(RSelenium)
-#library(rvest) # Do we actually use this?
-#library(stringi) # Do we actually use this?
+#library(rvest) # We should consider using this in lieu of RSelenium for the queries
 library(stringr) # We use str_split() and and str_replace() in get_number()
 library(profvis) # We use pause()
-library(tidyverse)
 
-          ## Source Primary Functions
 
+          ## Source primary functions
 
 source('primary_functions.R')
 
+          ## Generate .RData files for storing data
 
-          ## Execute Web Scraping
+## DO NOT RUN the code in this section unless starting a new set of searches
+## from scratch as duplicate filenames will be overwritten 
 
+## Define a list of search terms
+terms <- list(c("driverless", "autonomous car", "self-driving car"),
+              c("electric cars", "electric vehicles"),
+              c("cloud computing"),
+              c("solar panels","solar cells","solar electricity"),
+              c("smartphone","smart phone", "iPhone"),
+              c("3D printing","additive manufacturing"))
 
-## Define a test URL that will be used to initiate session
-test_url <- "https://infoweb-newsbank-com.stanford.idm.oclc.org/resources/search/nb?p=AWNB&b=results&action=search&fld0=YMD_date&val0=Jan+1980&bln1=AND&fld1=YMD_date&val1=&sort=YMD_date%3AD"
+## Define a vector of corresponding filenames for storing data
+filenames <- c("autonomous_cars.RData",
+               "electric_cars.RData",
+               "cloud_computing.RData",
+               "solar_tech.RData",
+               "smartphones.RData",
+               "3D_printing.RData")
 
-## Enter Stanford login information
-usr <- ""
-pwd <- ""
-
-## Initiate automated Google Chrome window ("remDr")
-driver<- rsDriver()
-remDr <- driver[["client"]]
-
-## Try to navigates to the first URL
-remDr$navigate(test_url)
-
-## If this re-directs to login.stanford.edu, enter two-factor authorization info
-## (DUO push still not enabled)
-current_url <- unlist(remDr$getCurrentUrl())
-if (grepl("login.stanford.edu", current_url)){twofa_login(usr,pwd)}
-
-## You have to pause here to resolve duo push if needed.
-
-## Define first month and year and last month and year of search queries
-first_month <- "Jan"
-first_year <- 1985
-last_month <- "Sep"
-last_year <- 2018
+generate_datafiles(words = terms, files = filenames, nsnip = 50)
 
 
-## Load each URL and scrape the number of hits plus text snippets (get_snippets
-## = sample_text).  Note: we will eventually want a function that runs a for
-## loop on execute_queries for each set of search terms and then combines the
-## results, but for now let's just execute several blocks of code.
+          ## Initiate AWN session with manual login
 
+get_awn_session()
+#twofa_login() # We currently do not use this; login manually
 
-## Search 2: Autonomous Cars
-## Create a vector of key search and ensure that entries with multiple words are
-## in the proper format for constructing URLs
-words <- c("driverless", "autonomous car", "self-driving car")
-words <- format_words(words)
-word_string <- make_string(words)
+          ## Execute web scraping
 
-## Initialize variables for storing data
-urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
-hits <- count_data(first_month, first_year, last_month, last_year)
-snippets <- list()
-save(urls, hits, snippets, file = "autonomous_cars.RData")
-
-start <- Sys.time()
+## Load each data file, and scrape using stored URLs.  Set 'nsnip' to the number
+## of snippets to be returned, or the function will only scrape hits.
 execute_queries(file = "autonomous_cars.RData", nsnip = 50)
-fin <- Sys.time()
-fin - start
+execute_queries(file = "electric_cars.RData", nsnip = 50)
+
+execute_queries(file = "smartphones.RData", nsnip = 50)
+execute_queries(file = "3D_printing.RData", nsnip = 50)
 
 
-## Search 0: Baseline (for normalization)
-urls <- generate_baseline_urls(first_month, first_year, last_month, last_year, word_string)
+          ## Close the automated Chrome window
+
+remDr$close()
+
+
+## Get baseline hits (for normalization) if needed
+urls <- generate_baseline_urls(beg_month = "Jan", beg_year = 1985, end_month = "Sep", end_year = 2018)
 hits <- count_data(first_month, first_year, last_month, last_year)
 save(urls, hits, file = "baseline.RData")
-
-start <- Sys.time()
 execute_queries(file = "baseline.RData")
-fin <- Sys.time()
-fin - start
 
 
-## Search 3: Electric Cars
-words <- c("electric cars", "electric vehicles")
-words <- format_words(words)
-word_string <- make_string(words)
 
-urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
-hits <- count_data(first_month, first_year, last_month, last_year)
-snippets <- list()
-save(urls, hits, snippets, file = "electric_cars.RData")
 
-start <- Sys.time()
-execute_queries(file = "electric_cars.RData", nsnip = 50)
-fin <- Sys.time()
-fin - start
+
 
 
 ## Search 4: Cloud Computing
@@ -145,39 +117,8 @@ fin <- Sys.time()
 fin - start
 
 
-## Search 6: Smartphones
-words <- c("smartphone","smart phone", "iPhone")
-words <- format_words(words)
-word_string <- make_string(words)
-
-urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
-hits <- count_data(first_month, first_year, last_month, last_year)
-snippets <- list()
-save(urls, hits, snippets, file = "smartphones.RData")
-
-start <- Sys.time()
-execute_queries(file = "smartphones.RData", nsnip = 50)
-fin <- Sys.time()
-fin - start
 
 
-## Search 7: 3D Printing
-words <- c("3D printing","additive manufacturing")
-words <- format_words(words)
-word_string <- make_string(words)
-
-urls <- generate_urls(first_month, first_year, last_month, last_year, word_string)
-hits <- count_data(first_month, first_year, last_month, last_year)
-snippets <- list()
-save(urls, hits, snippets, file = "3D_printing.RData")
-
-start <- Sys.time()
-execute_queries(file = "3D_printing.RData", nsnip = 50)
-fin <- Sys.time()
-fin - start
-
-## Close the automated Chrome window
-remDr$close()
 
 
           ## Save results.
