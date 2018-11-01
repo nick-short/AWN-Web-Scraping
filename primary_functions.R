@@ -284,7 +284,7 @@ execute_queries <- function(file, nsnip = NULL){
   load(file = file)
   
   # Set start_time if we are tracking time (if variable "time" exists in the file)
-  if (exists("time")){start_time <- Sys.time()}
+  if (exists("timestamps")){start_time <- Sys.time()}
   
   # Identify the first NA in hits$count.  If there are no results written (index
   # == 1), start at the first row / URL; otherwise, start one row prior to the
@@ -312,15 +312,15 @@ execute_queries <- function(file, nsnip = NULL){
       }
     
     # Calculate time differential and reset clock on start_time
-    if (exists("time")){
-      time[i] <- difftime(Sys.time(), start_time, units = "secs")
+    if (exists("timestamps")){
+      timestamps[i] <- difftime(Sys.time(), start_time, units = "secs")
       start_time <- Sys.time()
     }
     
     # Every tenth observation, and on the last observation, save results
     if ((i %% 10 == 0) | i == length(urls)){
-      if (exists("time")){
-        if (exists("snippets")){save(urls, hits, snippets, time, file = file)} else{save(urls, hits, time, file = file)}} else {
+      if (exists("timestamps")){
+        if (exists("snippets")){save(urls, hits, snippets, timestamps, file = file)} else{save(urls, hits, timestamps, file = file)}} else {
         if (exists("snippets")){save(urls, hits, snippets, file = file)} else{save(urls, hits, file = file)}}
     }
     
