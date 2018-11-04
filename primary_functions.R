@@ -194,7 +194,7 @@ get_number <- function(){
 # will sequentially advance the browser page by page and extract the text
 # snippets shown on each page.
 
-get_snippets <- function(num, tot_results){
+get_snippets <- function(num, tot_results, curr_url){
   cap <- min(num, tot_results, na.rm = TRUE)
   snippets <- rep(NA, cap)
   count <- 1
@@ -241,8 +241,17 @@ get_snippets <- function(num, tot_results){
         count <- count + 1
       }
       
-      next_button <- remDr$findElement(using = 'css selector', ".pager-next a")
-      next_button$clickElement()
+      if(k == 1) {
+        sub("page=0", "", curr_url)
+        sub("nb?", paste0("nb?page=", k ,"&"), curr_url)
+      } else {
+        sub(paste0("nb?page=", k-1), paste0("nb?page=", k), curr_url)
+      }
+      
+      remDr$navigate(curr_url)
+      
+      #next_button <- remDr$findElement(using = 'css selector', ".pager-next a")
+      #next_button$clickElement()
       
     }
     
@@ -276,7 +285,6 @@ get_snippets <- function(num, tot_results){
 ## the 'hits' data frame will be returned; (2) if also scraping snippets, a list
 ## with the 'hits' data frame as the first element and the list of snippets as
 ## the second element will be returned.
-
 execute_queries <- function(file, nsnip = NULL){
   
   # Load the file where results are to be written.  This file must contain a
@@ -307,7 +315,7 @@ execute_queries <- function(file, nsnip = NULL){
       if (tot_results > 0){ # If total results is positive, scrape
         
         if (is.null(nsnip)){nsnip <- tot_results} # If nsnip is not specified, set to total number of hits
-          snippets[[i]] <- get_snippets(nsnip, tot_results)
+          snippets[[i]] <- get_snippets(nsnip, tot_results, urls[i])
           } else {snippets[[i]] <- NA} # Otherwise, set to NA
       }
     
