@@ -27,7 +27,7 @@ generate_urls <- function(beg_month, beg_year, end_month, end_year, search_words
   
   url_prefix <- 'https://infoweb-newsbank-com.stanford.idm.oclc.org/resources/search/nb?p=AWNB&b=results&action=search&fld0=YMD_date&val0='
   url_middle <- '&bln1=AND&fld1=alltext&val1='
-  url_suffix <- '&bln2=OR&fld2=alltext&val2=&bln3=OR&fld3=alltext&val3=&sort=YMD_date%3AD'
+  url_suffix <- '&bln2=OR&fld2=alltext&val2=&bln3=OR&fld3=alltext&val3=&sort=_rank_%3AD&maxresults=50&page=0'
   
   urls <- paste(url_prefix, all_dates, url_middle, search_words, url_suffix, sep = "")
   #urls <- gsub("\\\\", "", urls, fixed = TRUE)
@@ -201,18 +201,18 @@ get_snippets <- function(num, tot_results){
   rpp <- 50 # Define number of results per page
   
   # Re-sort so that the best matches are displayed first
-  sort_dropdown <- remDr$findElement(using='css selector', "#result-sort")
-  sort_dropdown$clickElement()
+  #sort_dropdown <- remDr$findElement(using='css selector', "#result-sort")
+  #sort_dropdown$clickElement()
   
-  relevant_first <- remDr$findElement(using = 'xpath', value = '//*[@id="resultsort-_rank_D"]')
-  relevant_first$clickElement()
+  #relevant_first <- remDr$findElement(using = 'xpath', value = '//*[@id="resultsort-_rank_D"]')
+  #relevant_first$clickElement()
   
   # Change page options to display 50 result per page
-  num_results_dropdown <- remDr$findElement(using='id', value="display-options")
-  num_results_dropdown$clickElement()
+  #num_results_dropdown <- remDr$findElement(using='id', value="display-options")
+  #num_results_dropdown$clickElement()
   
-  fifty_results <- remDr$findElement(using = 'xpath', '//*[@id="change-results-per-page-50"]')
-  fifty_results$clickElement()
+  #fifty_results <- remDr$findElement(using = 'xpath', '//*[@id="change-results-per-page-50"]')
+  #fifty_results$clickElement()
   
   # If there are rpp or less results then simply take text snippets from the
   # num results; otherwise iterate through each page
