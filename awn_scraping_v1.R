@@ -64,9 +64,9 @@ remDr <- get_awn_session()
 ## Load each data file, and scrape using stored URLs.  Set 'nsnip' to the number
 ## of snippets to be returned, or the function will only scrape hits.
 execute_queries(file = "autonomous_cars.RData", nsnip = 50)
-execute_queries(file = "electric_cars.RData", nsnip = 50)
-execute_queries(file = "cloud_computing.RData", nsnip = 50)
-execute_queries(file = "solar_tech.RData", nsnip = 50)
+execute_queries(file = "electric_cars.RData", nsnip = 50) # Wrong urls
+execute_queries(file = "cloud_computing.RData", nsnip = 50) # Wrong urls
+execute_queries(file = "solar_tech.RData", nsnip = 50) # Not done
 execute_queries(file = "smartphones.RData", nsnip = 50)
 execute_queries(file = "3D_printing.RData", nsnip = 50)
 

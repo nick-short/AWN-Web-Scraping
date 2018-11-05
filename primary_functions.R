@@ -128,7 +128,7 @@ generate_datafiles <- function(words, files, nsnip = NULL, first_month = NULL, f
   
   words_len <- length(words)
   files_len <- length(files)
-  try(if(words_len == files_len) stop("Word list and file vector have different lengths."))
+  if(words_len != files_len) stop("Word list and file vector have different lengths.")
   
   ## Set default values if not passed to function
   if(is.null(first_month)){first_month = "Jan"}
@@ -139,7 +139,8 @@ generate_datafiles <- function(words, files, nsnip = NULL, first_month = NULL, f
   for (j in 1:words_len){
     
     ## Format words and create single string of search terms
-    word_vec <- format_words(words[[j]])
+    word_vec <- unlist(words[[j]])
+    word_vec <- format_words(word_vec)
     word_string <- make_string(word_vec)
     
     ## Initialize variables for storing data
