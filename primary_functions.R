@@ -27,7 +27,7 @@ generate_urls <- function(beg_month, beg_year, end_month, end_year, search_words
   
   url_prefix <- 'https://infoweb-newsbank-com.stanford.idm.oclc.org/resources/search/nb?p=AWNB&b=results&action=search&fld0=YMD_date&val0='
   url_middle <- '&bln1=AND&fld1=alltext&val1='
-  url_suffix <- '&bln2=OR&fld2=alltext&val2=&bln3=OR&fld3=alltext&val3=&sort=YMD_date%3AD'
+  url_suffix <- '&bln2=OR&fld2=alltext&val2=&bln3=OR&fld3=alltext&val3=&sort=_rank_%3AD&maxresults=50&page=0'
   
   urls <- paste(url_prefix, all_dates, url_middle, search_words, url_suffix, sep = "")
   #urls <- gsub("\\\\", "", urls, fixed = TRUE)
@@ -195,25 +195,25 @@ get_number <- function(){
 # will sequentially advance the browser page by page and extract the text
 # snippets shown on each page.
 
-get_snippets <- function(num, tot_results){
+get_snippets <- function(num, tot_results, curr_url){
   cap <- min(num, tot_results, na.rm = TRUE)
   snippets <- rep(NA, cap)
   count <- 1
   rpp <- 50 # Define number of results per page
   
   # Re-sort so that the best matches are displayed first
-  sort_dropdown <- remDr$findElement(using='css selector', "#result-sort")
-  sort_dropdown$clickElement()
+  #sort_dropdown <- remDr$findElement(using='css selector', "#result-sort")
+  #sort_dropdown$clickElement()
   
-  relevant_first <- remDr$findElement(using = 'xpath', value = '//*[@id="resultsort-_rank_D"]')
-  relevant_first$clickElement()
+  #relevant_first <- remDr$findElement(using = 'xpath', value = '//*[@id="resultsort-_rank_D"]')
+  #relevant_first$clickElement()
   
   # Change page options to display 50 result per page
-  num_results_dropdown <- remDr$findElement(using='id', value="display-options")
-  num_results_dropdown$clickElement()
+  #num_results_dropdown <- remDr$findElement(using='id', value="display-options")
+  #num_results_dropdown$clickElement()
   
-  fifty_results <- remDr$findElement(using = 'xpath', '//*[@id="change-results-per-page-50"]')
-  fifty_results$clickElement()
+  #fifty_results <- remDr$findElement(using = 'xpath', '//*[@id="change-results-per-page-50"]')
+  #fifty_results$clickElement()
   
   # If there are rpp or less results then simply take text snippets from the
   # num results; otherwise iterate through each page
@@ -242,8 +242,17 @@ get_snippets <- function(num, tot_results){
         count <- count + 1
       }
       
-      next_button <- remDr$findElement(using = 'css selector', ".pager-next a")
-      next_button$clickElement()
+      if(k == 1) {
+        sub("page=0", "", curr_url)
+        sub("nb?", paste0("nb?page=", k ,"&"), curr_url)
+      } else {
+        sub(paste0("nb?page=", k-1), paste0("nb?page=", k), curr_url)
+      }
+      
+      remDr$navigate(curr_url)
+      
+      #next_button <- remDr$findElement(using = 'css selector', ".pager-next a")
+      #next_button$clickElement()
       
     }
     
@@ -277,7 +286,6 @@ get_snippets <- function(num, tot_results){
 ## the 'hits' data frame will be returned; (2) if also scraping snippets, a list
 ## with the 'hits' data frame as the first element and the list of snippets as
 ## the second element will be returned.
-
 execute_queries <- function(file, nsnip = NULL){
   
   # Load the file where results are to be written.  This file must contain a
@@ -308,7 +316,7 @@ execute_queries <- function(file, nsnip = NULL){
       if (tot_results > 0){ # If total results is positive, scrape
         
         if (is.null(nsnip)){nsnip <- tot_results} # If nsnip is not specified, set to total number of hits
-          snippets[[i]] <- get_snippets(nsnip, tot_results)
+          snippets[[i]] <- get_snippets(nsnip, tot_results, urls[i])
           } else {snippets[[i]] <- NA} # Otherwise, set to NA
       }
     
