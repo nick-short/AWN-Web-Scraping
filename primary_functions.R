@@ -327,7 +327,7 @@ execute_queries <- function(file, nsnip = NULL){
     }
     
     # Every tenth observation, and on the last observation, save results
-    if ((i %% 10 == 0) | i == length(urls)){
+    if ((i %% 5 == 0) | i == length(urls)){
       if (exists("timestamps")){
         if (exists("snippets")){save(urls, hits, snippets, timestamps, file = file)} else{save(urls, hits, timestamps, file = file)}} else {
         if (exists("snippets")){save(urls, hits, snippets, file = file)} else{save(urls, hits, file = file)}}
