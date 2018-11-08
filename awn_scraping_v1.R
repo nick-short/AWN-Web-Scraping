@@ -78,23 +78,25 @@ execute_queries(file = "baseline.RData")
 
           ## Conduct tests for scraping time if desired
 
-test_terms <- generate_test_terms(n = 20) # n is the number of bi-grams
-generate_datafiles(words = test_terms, files = "testfile_0snip.RData")
-generate_datafiles(words = test_terms, files = "testfile_50snip.RData", nsnip = 50)
-generate_datafiles(words = test_terms, files = "testfile_100snip.RData", nsnip = 100)
+test_terms <- list(generate_test_terms(n = 20)) # n is the number of bi-grams
+generate_datafiles(test_words = test_terms, files = c("testfile_0snip.RData"))
+generate_datafiles(test_words = test_terms, files = c("testfile_50snip.RData"), nsnip = 50)
+generate_datafiles(test_words = test_terms, files = c("testfile_100snip.RData"), nsnip = 100)
 
-test_filenames <- c("testfile_0snip.RData", 
+test_filenames <- c("testfile_0snip.RData",
                     "testfile_50snip.RData",
                     "testfile_100snip.RData")
 for (j in 1:length(test_filenames)) {
   load(file = test_filenames[j])
   timestamps <- vector(mode = "numeric", length = nrow(hits))
-  save(hits, snippets, urls, timestamps, file = test_filenames[j])
+  if(exists("snippets")){save(hits, snippets, urls, timestamps, file = test_filenames[j])} else{
+    save(hits, urls, timestamps, file = test_filenames[j])
+  }
 }
 
-execute_queries(file = "testfile_0snip")
-execute_queries(file = "testfile_50snip", nsnip = 50)
-execute_queries(file = "testfile_100snip", nsnip = 100)
+execute_queries(file = "testfile_0snip.RData")
+execute_queries(file = "testfile_50snip.RData", nsnip = 50)
+execute_queries(file = "testfile_100snip.RData", nsnip = 100)
 
           ## Close the automated Chrome window
 

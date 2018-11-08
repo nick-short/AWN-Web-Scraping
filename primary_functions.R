@@ -1,7 +1,7 @@
 ## This function will format the provided search 'words' by substituting "+" for
 ## white space
 
-format_words <- function(terms){return(as.character(sapply(X = words, FUN = function(y){y <- gsub(" ", "+", y, fixed = TRUE)})))}
+format_words <- function(terms){return(as.character(sapply(X = terms, FUN = function(y){y <- gsub(" ", "+", y, fixed = TRUE)})))}
 
 ## This function will take a vector of search words and create a single string
 ## to be used in constructing the URL
@@ -124,9 +124,9 @@ twofa_login <- function(username, password){
 ## and it will generate .RData files for storing results.  Note: this function
 ## needs to be tested.
 
-generate_datafiles <- function(words, files, nsnip = NULL, first_month = NULL, first_year = NULL, last_month = NULL, last_year = NULL){
+generate_datafiles <- function(test_words, files, nsnip = NULL, first_month = NULL, first_year = NULL, last_month = NULL, last_year = NULL){
   
-  words_len <- length(words)
+  words_len <- length(test_words)
   files_len <- length(files)
   if(words_len != files_len) stop("Word list and file vector have different lengths.")
   
@@ -139,7 +139,7 @@ generate_datafiles <- function(words, files, nsnip = NULL, first_month = NULL, f
   for (j in 1:words_len){
     
     ## Format words and create single string of search terms
-    word_vec <- unlist(words[[j]])
+    word_vec <- test_words[[j]]
     word_vec <- format_words(word_vec)
     word_string <- make_string(word_vec)
     
