@@ -83,8 +83,7 @@ generate_datafiles(test_words = test_terms, files = c("testfile_0snip.RData"))
 generate_datafiles(test_words = test_terms, files = c("testfile_50snip.RData"), nsnip = 50)
 generate_datafiles(test_words = test_terms, files = c("testfile_100snip.RData"), nsnip = 100)
 
-test_filenames <- c("testfile_0snip.RData",
-                    "testfile_50snip.RData",
+test_filenames <- c("testfile_50snip.RData",
                     "testfile_100snip.RData")
 for (j in 1:length(test_filenames)) {
   load(file = test_filenames[j])
@@ -97,6 +96,20 @@ for (j in 1:length(test_filenames)) {
 execute_queries(file = "testfile_0snip.RData")
 execute_queries(file = "testfile_50snip.RData", nsnip = 50)
 execute_queries(file = "testfile_100snip.RData", nsnip = 100)
+
+load("testfile_0snip.RData")
+hits_test <- c(0,timestamps[timestamps > 5])
+rm(hits, urls, timestamps)
+n <- length(hits_test)
+hits_tbl <- vector(mode = "numeric",n)
+for (i in 1:n){hits_tbl[i] <- sum(hits_test[1:i])}
+hits_tbl <- tbl_df(hits_tbl) %>% 
+  rename("elapsed_time" = "value") %>%
+  mutate(elapsed_time = elapsed_time / 60) %>% # Convert seconds to minutes
+  mutate(observations = c(1:n))
+
+ggplot(hits_tbl, aes(x = observations, y = elapsed_time)) + geom_point()
+summary(lm(elapsed_time ~ observations, data = hits_tbl))
 
           ## Close the automated Chrome window
 
