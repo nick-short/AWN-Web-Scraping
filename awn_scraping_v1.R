@@ -36,22 +36,31 @@ source('primary_functions.R')
 ## from scratch as duplicate filenames will be overwritten 
 
 ## Define a list of search terms
-terms <- list(c("driverless", "autonomous car", "self-driving car"),
-              c("electric cars", "electric vehicles"),
-              c("cloud computing"),
-              c("solar panels","solar cells","solar electricity"),
-              c("smartphone","smart phone", "iPhone"),
-              c("3D printing","additive manufacturing"))
+terms <- list(c("drone","unmanned aerial vehicle","UAV"),
+              c("driverless","autonomous car","self-driving car", "autonomous cars",
+                "self-driving cars","selfdriving car","selfdriving cars",
+                "self-driving truck","self-driving trucks"),
+              c("electric car","electric vehicle","electric cars","electric vehicles",
+                "electric hybrid","lithium ion battery","lithium ion batteries",
+                "electric aircraft","liion batteries"),
+              c("cloud computing","cloud technology","cloud resources","cloud storage",
+                "software as a service","cloud applications"),
+              c("solar panels","solar cells","solar electricity","solar inverter",
+                "solar power","solar cell","solar panel","photovoltaic"),
+              c("smartphone","smart phone","iPhone","mobile internet","smart phones",
+                "smartphones","samsung galaxy"),
+              c("3D printing","additive manufacturing","inkjet bioprinting"))
 
 ## Define a vector of corresponding filenames for storing data
-filenames <- c("autonomous_cars.RData",
+filenames <- c("drones.RData",
+               "autonomous_cars.RData",
                "electric_cars.RData",
                "cloud_computing.RData",
                "solar_tech.RData",
                "smartphones.RData",
                "3D_printing.RData")
 
-generate_datafiles(words = terms, files = filenames, nsnip = 50)
+generate_datafiles(words = terms, files = filenames)
 
           ## Initiate AWN session with manual login
 
@@ -63,16 +72,17 @@ remDr <- get_awn_session()
 
 ## Load each data file, and scrape using stored URLs.  Set 'nsnip' to the number
 ## of snippets to be returned, or the function will only scrape hits.
-execute_queries(file = "autonomous_cars.RData", nsnip = 50)
-execute_queries(file = "electric_cars.RData", nsnip = 50) # Wrong urls
-execute_queries(file = "cloud_computing.RData", nsnip = 50) # Wrong urls
-execute_queries(file = "solar_tech.RData", nsnip = 50) # Not done
-execute_queries(file = "smartphones.RData", nsnip = 50)
-execute_queries(file = "3D_printing.RData", nsnip = 50)
+execute_queries(file = "drones.RData")
+execute_queries(file = "autonomous_cars.RData")
+execute_queries(file = "electric_cars.RData") 
+execute_queries(file = "cloud_computing.RData") 
+execute_queries(file = "solar_tech.RData") 
+execute_queries(file = "smartphones.RData")
+execute_queries(file = "3D_printing.RData")
 
 ## Get baseline hits (for normalization) if needed
 urls <- generate_baseline_urls(beg_month = "Jan", beg_year = 1985, end_month = "Sep", end_year = 2018)
-hits <- count_data(first_month, first_year, last_month, last_year)
+hits <- count_data(beg_month = "Jan", beg_year = 1985, end_month = "Sep", end_year = 2018)
 save(urls, hits, file = "baseline.RData")
 execute_queries(file = "baseline.RData")
 
