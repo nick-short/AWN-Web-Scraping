@@ -60,7 +60,7 @@ filenames <- c("drones.RData",
                "smartphones.RData",
                "3D_printing.RData")
 
-generate_datafiles(words = terms, files = filenames)
+generate_datafiles(test_words = terms, files = filenames)
 
           ## Initiate AWN session with manual login
 
@@ -72,13 +72,13 @@ remDr <- get_awn_session()
 
 ## Load each data file, and scrape using stored URLs.  Set 'nsnip' to the number
 ## of snippets to be returned, or the function will only scrape hits.
-execute_queries(file = "drones.RData")
+execute_queries(file = "drones.RData") # Done
 execute_queries(file = "autonomous_cars.RData")
 execute_queries(file = "electric_cars.RData") 
 execute_queries(file = "cloud_computing.RData") 
 execute_queries(file = "solar_tech.RData") 
-execute_queries(file = "smartphones.RData")
-execute_queries(file = "3D_printing.RData")
+execute_queries(file = "smartphones.RData") # Done
+execute_queries(file = "3D_printing.RData") # Done
 
 ## Get baseline hits (for normalization) if needed
 urls <- generate_baseline_urls(beg_month = "Jan", beg_year = 1985, end_month = "Sep", end_year = 2018)
