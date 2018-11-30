@@ -355,28 +355,32 @@ execute_queries <- function(file, nsnip = NULL){
 ## the number of rows in the final dataframe, and to pass the vector of dates.
 
 stitch_hits <- function(filelist, basefile = NULL, mvavg_win = NULL){
-  ncols <- length(filelist)
-  load(filelist[[1]])
-  nrows <- nrow(hits)
-  varnames <- str_split(filelist, pattern = fixed("."), simplify = TRUE)[, 1] # Keep everything before period as a variable name
-  results <- data.frame(matrix(data = NA, nrow = nrows, ncol = (ncols + 1)))
-  colnames(results) <- c("date",varnames)
-  results[,1] <- hits$date
-  results[,2] <- hits$count
+  if (!is.null(basefile)){
+    load(file = basefile)
+    baseline <- hits}
   
-  for (j in 3:(ncols+1)){
-    load(filelist[(j-1)])
-    results[,j] = hits$count}
+  # Create truncated filenames as a variable name for the technology class
+  class_names <- str_split(filelist, pattern = fixed("."), simplify = TRUE)[, 1] 
   
-  if(!is.null(basefile)){
-    load(basefile)
-    if(is.null(mvavg_win)){for (k in 2:(ncols+1)){results[,k] <- results[,k] / hits$count}} else{
-      ## Implement moving average here.  Code below copied/pasted and untested.
+  load(filelist[[1]]) # Load the first file
+  if(nrow(baseline) != nrow(hits)) stop("Data frames have different number of observations (and may cover different time frames.")
+  hits$tech_class <- class_names[1] # Set new variable tech_class equal to first filename
+  hits$count <- hits$count / baseline$count
+  results <- hits # Initialize the results data frame with the hits results from the first file
+  
+  for (j in 2:length(filelist)){
+    load(filelist[[j]]) # Load the first file
+    if(nrow(baseline) != nrow(hits)) stop("Data frames have different number of observations (and may cover different time frames.")
+    hits$tech_class <- class_names[j] # Set new variable tech_class equal to first filename
+    hits$count <- hits$count / baseline$count
+    results <- bind_rows(results,hits) # Add to results
+  }
+  
+     ## Implement moving average here.  Code below copied/pasted and untested.
       #baseline_results$count_ma <- NA
       #ma_window <- 13 # Length of rolling mean spread
       #baseline_results$count_ma[ma_window:(nrow(baseline_results) - ma_window + 1)] <- rollmean(baseline_results$count, ma_window)
       #hits$prop_ma <- hits$count / baseline_results$count_ma
       
-    }
-  }
+  return(results)
 }

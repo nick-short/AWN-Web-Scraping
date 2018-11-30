@@ -60,7 +60,7 @@ filenames <- c("drones.RData",
                "smartphones.RData",
                "3D_printing.RData")
 
-generate_datafiles(test_words = terms, files = filenames)
+#generate_datafiles(test_words = terms, files = filenames)
 
           ## Initiate AWN session with manual login
 
@@ -130,22 +130,17 @@ remDr$close()
 ## Stitch the hit data together.  This will handle the  normalization (set the
 ## mvavg_win to a numeric for the length of the window in months if you want a
 ## moving average of baseline hits).  Data will be in wide format.
-hits <- stitch_hits(filenames, basefile = "baseline.RData")
 
-## Shape the data.  Convert dates into year-months.
+hits <- stitch_hits(filenames, basefile = "old_data/baseline.RData")
+  #spread(key = "tech_class", value = "count") %>%
+  #mutate(date = as.yearmon(date, "%d%b%Y"))
 
-hits$date <- as.yearmon(hits$date, "%d%b%Y")
-
-
-# This overlays the plots of the monthly average (blue) and 13-month moving
-# average (red) of the query in question. It is likely that these won't be the
-# plots we end up overlaying, but we have been discussing the matter of which is
-# better to use, so at the moment, these plots are overlayed for comparison.
-p <- ggplot(hits) + xlab("Time") + ylab("Proportion of Results") +
-  labs(title = 'Proportion of Results for "Cloud Computing" on Access World News Time Series') +
-  geom_line(aes(x = date, y = prop_ma, colour = "Yearly_Moving_Average")) + 
-  geom_line(aes(x = date, y = prop, colour = "Standard_Monthly_Proportion")) + 
-  scale_color_manual(name = "Type of Proportion", 
-                     values = c(Yearly_Moving_Average = "red", 
-                                Standard_Monthly_Proportion = "dark blue"))
-p
+ggplot(hits, aes(x = date, y = count)) + geom_line(size = 0.3) +
+  facet_wrap(~tech_class, scales = "free_y") +
+  labs(title = "Disruptive Technology News Events",
+       subtitle = "Each plot shows the monthly number of news articles published about a given technology class from January of 1985 through September 2018.  The raw number of articles are converted 
+to relative counts by dividing by the total number of articles published in the same month.",
+       caption = "Based on data obtained from Access World News") +
+  ylab("Relative News Frequency") + 
+  theme(axis.title.x=element_blank())
+ggsave(file = "counts_by_tech_class.pdf")
