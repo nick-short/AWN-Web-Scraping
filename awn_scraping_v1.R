@@ -131,9 +131,10 @@ remDr$close()
 ## mvavg_win to a numeric for the length of the window in months if you want a
 ## moving average of baseline hits).  Data will be in wide format.
 
-hits <- stitch_hits(filenames, basefile = "old_data/baseline.RData")
-  #spread(key = "tech_class", value = "count") %>%
+hits <- stitch_hits(filenames, basefile = "old_data/baseline.RData") %>%
+  spread(key = "tech_class", value = "count")
   #mutate(date = as.yearmon(date, "%d%b%Y"))
+write_csv(hits, path = "pilot_alldata.csv")
 
 ggplot(hits, aes(x = date, y = count)) + geom_line(size = 0.3) +
   facet_wrap(~tech_class, scales = "free_y") +
