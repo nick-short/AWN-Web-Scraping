@@ -76,7 +76,7 @@ execute_queries(file = "drones.RData") # Done
 execute_queries(file = "autonomous_cars.RData") # Done
 execute_queries(file = "electric_cars.RData") # Done
 execute_queries(file = "cloud_computing.RData") # Done
-execute_queries(file = "solar_tech.RData") # In progress
+execute_queries(file = "solar_tech.RData") # Done
 execute_queries(file = "smartphones.RData") # Done
 execute_queries(file = "3D_printing.RData") # Done
 
