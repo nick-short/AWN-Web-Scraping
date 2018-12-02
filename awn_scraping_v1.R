@@ -127,15 +127,15 @@ remDr$close()
 
           ## Analyze results.
 
-## Stitch the hit data together.  This will handle the  normalization (set the
-## mvavg_win to a numeric for the length of the window in months if you want a
-## moving average of baseline hits).  Data will be in wide format.
+## Stitch the hit data together in long format and copy to data visualization
+## folder.  This will handle the  normalization (set the mvavg_win to a numeric
+## for the length of the window in months if you want a moving average of
+## baseline hits).  
 
-hits <- stitch_hits(filenames, basefile = "old_data/baseline.RData") %>%
-  spread(key = "tech_class", value = "count")
-  #mutate(date = as.yearmon(date, "%d%b%Y"))
-write_csv(hits, path = "pilot_alldata.csv")
+hits <- stitch_hits(filenames, basefile = "old_data/baseline.RData")
+write_csv(hits, path = "data_visualization/pilot_alldata.csv")
 
+## Plot results
 ggplot(hits, aes(x = date, y = count)) + geom_line(size = 0.3) +
   facet_wrap(~tech_class, scales = "free_y") +
   labs(title = "Disruptive Technology News Events",
@@ -145,3 +145,7 @@ to relative counts by dividing by the total number of articles published in the 
   ylab("Relative News Frequency") + 
   theme(axis.title.x=element_blank())
 ggsave(file = "counts_by_tech_class.pdf")
+
+## Spread data to wide format and save for Nick B and others to use
+hits <- spread(hits, key = "tech_class", value = "count")
+write_csv(hits, path = "pilot_alldata.csv")
