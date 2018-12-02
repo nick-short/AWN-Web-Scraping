@@ -31,7 +31,7 @@ ui <- fluidPage(
    # Application title
    titlePanel("Disruptive Technologies Event Analysis - Data Visualization"),
    
-   # Sidebar with ...
+   # Sidebar with a selectInput for technology class
    sidebarLayout(
       sidebarPanel(
         
@@ -59,6 +59,7 @@ ui <- fluidPage(
         #            selected = "2018")
         ),
       
+      # Main panel with a single time series plot for the selected technology class
       mainPanel(
         plotlyOutput("tsPlot")
       )
@@ -69,9 +70,7 @@ ui <- fluidPage(
 # number of news articles containing search terms related to a given technology
 # class divided by the total number of news articles published in the same month
 server <- function(input, output) {
-  
-  
-  
+
    output$tsPlot <- renderPlotly({
      
      # Convert time inputs to .Date format (including a day of 01)
