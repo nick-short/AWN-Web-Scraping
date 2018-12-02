@@ -8,41 +8,85 @@
 #
 
 library(shiny)
+library(tools)
+library(tidyverse)
+library(lubridate)
+library(plotly)
 
+# Read the CSV file; use filepath with subdirectory when troubleshooting line by line
+time_series <- read_csv("pilot_alldata.csv")
+#time_series <- read_csv("data_visualization/pilot_alldata.csv")
+
+# Define a named character vector containing the choices for technology class
+tech_choices <- unique(time_series$tech_class)
+names(tech_choices) <- toTitleCase(str_replace(unique(time_series$tech_class), pattern = "_", replacement = " "))
+
+# Define choices for time (month and year)
+#month_choices <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+#year_choices <- unique(str_sub(time_series$date, start = 1, end = 4))
+  
 # Define UI for application that draws a histogram
 ui <- fluidPage(
    
    # Application title
-   titlePanel("Old Faithful Geyser Data"),
+   titlePanel("Disruptive Technologies Event Analysis - Data Visualization"),
    
-   # Sidebar with a slider input for number of bins 
+   # Sidebar with ...
    sidebarLayout(
       sidebarPanel(
-         sliderInput("bins",
-                     "Number of bins:",
-                     min = 1,
-                     max = 50,
-                     value = 30)
-      ),
+        
+        # Have the user select the technology class
+        selectInput(inputId = "tech",
+                    label = "Technology Class:",
+                    choices = tech_choices,
+                    selected = "drones")#,
+        # Have the user select the month and year of the start (first) and end (last) date
+        #selectInput(inputId = "first_month",
+        #            label = "First Month:",
+        #            choices = month_choices,
+        #            selected = "Jan"),
+        #selectInput(inputId = "first_year",
+        #           label = "First Year:",
+        #           choices = year_choices,
+        #           selected = "1985"),
+        #selectInput(inputId = "last_month",
+        #            label = "Last Month:",
+        #            choices = month_choices,
+        #            selected = "Dec"),
+        #selectInput(inputId = "last_year",
+        #            label = "Last Year:",
+        #            choices = year_choices,
+        #            selected = "2018")
+        ),
       
-      # Show a plot of the generated distribution
       mainPanel(
-         plotOutput("distPlot")
+        plotlyOutput("tsPlot")
       )
    )
 )
 
-# Define server logic required to draw a histogram
+# Define server logic required to plot a simple time series showing monthly
+# number of news articles containing search terms related to a given technology
+# class divided by the total number of news articles published in the same month
 server <- function(input, output) {
-   
-   output$distPlot <- renderPlot({
-      # generate bins based on input$bins from ui.R
-      x    <- faithful[, 2] 
-      bins <- seq(min(x), max(x), length.out = input$bins + 1)
-      
-      # draw the histogram with the specified number of bins
-      hist(x, breaks = bins, col = 'darkgray', border = 'white')
-   })
+  
+  
+  
+   output$tsPlot <- renderPlotly({
+     
+     # Convert time inputs to .Date format (including a day of 01)
+     #first_date <- mdy(paste(input$first_month, "01,", input$first_year, sep = " "))
+     #last_date <- mdy(paste(input$last_month, "01,", input$last_year, sep = " "))
+     
+     # Generate time-series plot
+     time_series %>% 
+       filter(tech_class == input$tech) %>% # Filter by tech class
+       #filter(date >= first_date & date <= last_date) %>% # Filter by time boundaries
+       ggplot(aes_string(x = "date", y = "count")) +
+       geom_line(size = 0.5) +
+       ylab("Relative News Frequency") + 
+       theme(axis.title.x = element_blank())
+   }) 
 }
 
 # Run the application 

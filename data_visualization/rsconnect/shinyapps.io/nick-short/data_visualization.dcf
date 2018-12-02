@@ -1,0 +1,12 @@
+name: data_visualization
+title: data_visualization
+username:
+account: nick-short
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 600215
+bundleId: 1734486
+url: https://nick-short.shinyapps.io/data_visualization/
+when: 1543776670.40879
+asMultiple: FALSE
+asStatic: FALSE
