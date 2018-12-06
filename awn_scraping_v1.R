@@ -149,3 +149,12 @@ ggsave(file = "counts_by_tech_class.pdf")
 ## Spread data to wide format and save for Nick B and others to use
 hits <- spread(hits, key = "tech_class", value = "count")
 write_csv(hits, path = "pilot_alldata.csv")
+
+## Attempt to Scrape for Snippets Again
+new_terms <- list(c("cloud computing","cloud technology","cloud resources","cloud storage",
+                "software as a service","cloud applications"))
+
+new_filenames <- c("cloud_computing_with_snippets.RData")
+
+generate_datafiles(test_words = new_terms, files = new_filenames, nsnip = 50)
+execute_queries(file = "cloud_computing_with_snippets.RData", nsnip = 50)
