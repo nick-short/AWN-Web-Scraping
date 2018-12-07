@@ -151,10 +151,26 @@ hits <- spread(hits, key = "tech_class", value = "count")
 write_csv(hits, path = "pilot_alldata.csv")
 
 ## Attempt to Scrape for Snippets Again
-new_terms <- list(c("cloud computing","cloud technology","cloud resources","cloud storage",
-                "software as a service","cloud applications"))
+new_terms <- list(c("drone","unmanned aerial vehicle","UAV"),
+              c("driverless","autonomous car","self-driving car", "autonomous cars",
+                "self-driving cars","selfdriving car","selfdriving cars",
+                "self-driving truck","self-driving trucks"),
+              c("electric car","electric vehicle","electric cars","electric vehicles",
+                "electric hybrid","lithium ion battery","lithium ion batteries",
+                "electric aircraft","liion batteries"),
+              c("cloud computing","cloud technology","cloud resources","cloud storage",
+                "software as a service","cloud applications"),
+              c("solar panels","solar cells","solar electricity","solar inverter",
+                "solar power","solar cell","solar panel","photovoltaic"),
+              c("smartphone","smart phone","iPhone","mobile internet","smart phones",
+                "smartphones","samsung galaxy"),
+              c("3D printing","additive manufacturing","inkjet bioprinting"))
 
-new_filenames <- c("cloud_computing_with_snippets.RData")
+new_filenames <- c("drones_snippets.RData", "autonomous_cars_snippets.RData", "electric_cars_snippets.RData", 
+                   "cloud_computing_snippets.RData", "solar_tech_snippets.RData", "smartphones_snippets.RData", 
+                   "3D_printing_snippets.RData")
 
-generate_datafiles(test_words = new_terms, files = new_filenames, nsnip = 50)
-execute_queries(file = "cloud_computing_with_snippets.RData", nsnip = 50)
+generate_datafiles(test_words = new_terms, files = new_filenames, nsnip = 50, first_month = "Jan", 
+                   first_year = 2000)
+
+execute_queries(file = "drones_snippets.RData", nsnip = 50)
