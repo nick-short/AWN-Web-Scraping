@@ -1,7 +1,8 @@
 ## This function will format the provided search 'words' by substituting "+" for
 ## white space
 
-format_words <- function(terms){return(as.character(sapply(X = terms, FUN = function(y){y <- gsub(" ", "+", y, fixed = TRUE)})))}
+#format_words <- function(terms){return(as.character(sapply(X = terms, FUN = function(y){y <- gsub(" ", "+", y, fixed = TRUE)})))}
+format_words <- function(terms){return(as.character(sapply(X = terms, FUN = function(y){y <- gsub(" ", "%20", y, fixed = TRUE)})))}
 
 ## This function will take a vector of search words and create a single string
 ## to be used in constructing the URL
@@ -10,7 +11,8 @@ make_string <- function(word_vector){
   rep_str <- "%22"
   word_vector <- paste(rep_str, word_vector, rep_str, sep = "")
   word_string <- word_vector[1]
-  for(i in 2:length(word_vector)) {word_string <- paste(word_string, word_vector[i], sep = "+%7C+")}
+  #for(i in 2:length(word_vector)) {word_string <- paste(word_string, word_vector[i], sep = "+%7C+")}
+  for(i in 2:length(word_vector)) {word_string <- paste(word_string, word_vector[i], sep = "%20%7C%20")}
   return(word_string)
 }
 
@@ -23,18 +25,27 @@ generate_urls <- function(beg_month, beg_year, end_month, end_year, search_words
   
   months_rep <- rep(months, times = length(years))
   years_rep <- rep(years, each = length(months))
-  all_dates <- paste(months_rep, "+", years_rep, sep = "")
+  #all_dates <- paste(months_rep, "+", years_rep, sep = "")
+  all_dates <- paste(months_rep, "%20", years_rep, sep = "")
   
-  url_prefix <- 'https://infoweb-newsbank-com.stanford.idm.oclc.org/resources/search/nb?p=AWNB&b=results&action=search&fld0=YMD_date&val0='
-  url_middle <- '&bln1=AND&fld1=alltext&val1='
-  url_suffix <- '&bln2=OR&fld2=alltext&val2=&bln3=OR&fld3=alltext&val3=&sort=YMD_date%3AD'
-  #url_suffix <- '&bln2=OR&fld2=alltext&val2=&bln3=OR&fld3=alltext&val3=&sort=_rank_%3AD&maxresults=50&page=0'
+  url_prefix <- 'https://infoweb-newsbank-com.stanford.idm.oclc.org/apps/news/results?sort=_rank_%3AD&p=AWNB&t=&maxresults=100&f=advanced&b=results&val-base-0='
+  url_middle <- '&fld-base-0=YMD_date&bln-base-1=and&val-base-1='
+  #%22drone%22%20%7C%20%22unmanned%20aerial%20vehicle%22%20%7C%20%22UAV%22
+  url_suffix <- '&fld-base-1=alltext'
+  
+  #url_prefix <- 'https://infoweb-newsbank-com.stanford.idm.oclc.org/resources/search/nb?p=AWNB&b=results&action=search&fld0=YMD_date&val0='
+  #url_middle <- '&bln1=AND&fld1=alltext&val1='
+  #url_suffix <- '&bln2=OR&fld2=alltext&val2=&bln3=OR&fld3=alltext&val3=&sort=YMD_date%3AD'
+  ##url_suffix <- '&bln2=OR&fld2=alltext&val2=&bln3=OR&fld3=alltext&val3=&sort=_rank_%3AD&maxresults=50&page=0'
   
   urls <- paste(url_prefix, all_dates, url_middle, search_words, url_suffix, sep = "")
   #urls <- gsub("\\\\", "", urls, fixed = TRUE)
   
-  first_element <- which(all_dates == paste(beg_month, "+", beg_year, sep = ""))
-  last_element <- which(all_dates == paste(end_month, "+", end_year, sep = ""))
+  #first_element <- which(all_dates == paste(beg_month, "+", beg_year, sep = ""))
+  #last_element <- which(all_dates == paste(end_month, "+", end_year, sep = ""))
+  first_element <- which(all_dates == paste(beg_month, "%20", beg_year, sep = ""))
+  last_element <- which(all_dates == paste(end_month, "%20", end_year, sep = ""))
+  
   urls <- urls[first_element:last_element]
   
   return(urls)
@@ -223,7 +234,8 @@ get_snippets <- function(num, tot_results){
     
     for(j in 1:cap) {
       #print(j)
-      css <- paste("li:nth-child(", j, ") .preview", sep = "")
+      #css <- paste("li:nth-child(", j, ") .preview", sep = "")
+      css <- paste("search-hits__hit--", j, ".preview-dynamic", sep = "")
       text_box <- remDr$findElement(using = 'css selector', css)
       text_snippet <- as.character(text_box$getElementText())
       #print(text_snippet)

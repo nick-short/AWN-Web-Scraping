@@ -150,6 +150,7 @@ ggsave(file = "counts_by_tech_class.pdf")
 hits <- spread(hits, key = "tech_class", value = "count")
 write_csv(hits, path = "pilot_alldata.csv")
 
+
 ## Attempt to Scrape for Snippets Again
 new_terms <- list(c("drone","unmanned aerial vehicle","UAV"),
               c("driverless","autonomous car","self-driving car", "autonomous cars",
@@ -173,4 +174,8 @@ new_filenames <- c("drones_snippets.RData", "autonomous_cars_snippets.RData", "e
 generate_datafiles(test_words = new_terms, files = new_filenames, nsnip = 50, first_month = "Jan", 
                    first_year = 2000)
 
+remDr <- get_awn_session()
+
 execute_queries(file = "drones_snippets.RData", nsnip = 50)
+load(file = "drones_snippets.RData")
+urls[1]
