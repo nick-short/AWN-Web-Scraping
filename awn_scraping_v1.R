@@ -152,6 +152,7 @@ write_csv(hits, path = "pilot_alldata.csv")
 
 
 ## Attempt to Scrape for Snippets Again
+
 new_terms <- list(c("drone","unmanned aerial vehicle","UAV"),
               c("driverless","autonomous car","self-driving car", "autonomous cars",
                 "self-driving cars","selfdriving car","selfdriving cars",
@@ -159,7 +160,7 @@ new_terms <- list(c("drone","unmanned aerial vehicle","UAV"),
               c("electric car","electric vehicle","electric cars","electric vehicles",
                 "electric hybrid","lithium ion battery","lithium ion batteries",
                 "electric aircraft","liion batteries"),
-              c("cloud computing","cloud technology","cloud resources","cloud storage",
+              c("cloud computing","cloud technology", "cloud resources","cloud storage",
                 "software as a service","cloud applications"),
               c("solar panels","solar cells","solar electricity","solar inverter",
                 "solar power","solar cell","solar panel","photovoltaic"),
@@ -171,11 +172,14 @@ new_filenames <- c("drones_snippets.RData", "autonomous_cars_snippets.RData", "e
                    "cloud_computing_snippets.RData", "solar_tech_snippets.RData", "smartphones_snippets.RData", 
                    "3D_printing_snippets.RData")
 
-generate_datafiles(test_words = new_terms, files = new_filenames, nsnip = 50, first_month = "Jan", 
+generate_datafiles(test_words = new_terms, files = new_filenames, nsnip = 100, first_month = "Jan", 
                    first_year = 2000)
 
 remDr <- get_awn_session()
 
-execute_queries(file = "drones_snippets.RData", nsnip = 50)
-load(file = "drones_snippets.RData")
+execute_queries(file = "cloud_computing_snippets.RData", nsnip = 50)
+
+load(file = "cloud_computing_snippets.RData")
 urls[1]
+remDr$navigate(urls[1])
+remDr$close()

@@ -211,7 +211,7 @@ get_snippets <- function(num, tot_results){
   cap <- min(num, tot_results, na.rm = TRUE)
   snippets <- rep(NA, cap)
   count <- 1
-  rpp <- 10 # Define number of results per page
+  rpp <- 100 # Define number of results per page
   
   # Re-sort so that the best matches are displayed first
   #sort_dropdown <- remDr$findElement(using='css selector', "#result-sort")
@@ -230,7 +230,7 @@ get_snippets <- function(num, tot_results){
   # If there are rpp or less results then simply take text snippets from the
   # num results; otherwise iterate through each page
   
-  if (cap <= rpp) {
+  #if (cap <= rpp) {
     
     for(j in 1:cap) {
       css <- paste("#search-hits__hit--", j, " .preview-dynamic", sep = "")
@@ -239,24 +239,24 @@ get_snippets <- function(num, tot_results){
       #print(text_snippet)
       snippets[count] <- text_snippet
       count <- count + 1
-      #delay_time <- abs(rnorm(1,3,0.5))
+      delay_time <- abs(rnorm(1,0,0.1))
       #print(delay_time)
-      #pause(delay_time)
+      pause(delay_time)
     }
     
-  } else {
+  #} else {
     
     #start <- Sys.time()
-    num_floor <- floor(num / rpp)
-    for(k in 1:(num_floor)) {
+    #num_floor <- floor(num / rpp)
+    #for(k in 1:(num_floor)) {
       
-      for(j in 1:rpp) {
-        css <- paste("#search-hits__hit--", j, " .preview-dynamic", sep = "")
-        text_box <- remDr$findElement(using = 'css selector', css)
-        text_snippet <- as.character(text_box$getElementText())
-        snippets[count] <- text_snippet
-        count <- count + 1
-      }
+      #for(j in 1:rpp) {
+      #  css <- paste("#search-hits__hit--", j, " .preview-dynamic", sep = "")
+      #  text_box <- remDr$findElement(using = 'css selector', css)
+      #  text_snippet <- as.character(text_box$getElementText())
+      #  snippets[count] <- text_snippet
+      #  count <- count + 1
+      #}
       
       #if(k == 1) {
       #  sub("page=0", "", curr_url)
@@ -267,25 +267,25 @@ get_snippets <- function(num, tot_results){
       
       #remDr$navigate(curr_url)
       
-      next_button <- remDr$findElement(using = 'css selector', ".pager-next a")
-      next_button$clickElement()
+      #next_button <- remDr$findElement(using = 'css selector', ".pager__item--next a")
+      #next_button$clickElement()
       
-    }
+    #}
     
     # The last page will contain (num %% rpp) results
     
-    for(l in 1:(num %% rpp)) {
-      css <- paste("#search-hits__hit--", j, " .preview-dynamic", sep = "")
-      text_box <- remDr$findElement(using = 'css selector', css)
-      text_snippet <- as.character(text_box$getElementText())
-      snippets[count] <- text_snippet
-      count <- count + 1
-    }
+    #for(l in 1:(num %% rpp)) {
+    #  css <- paste("#search-hits__hit--", j, " .preview-dynamic", sep = "")
+    #  text_box <- remDr$findElement(using = 'css selector', css)
+    #  text_snippet <- as.character(text_box$getElementText())
+    #  snippets[count] <- text_snippet
+    #  count <- count + 1
+    #}
     
     #fin <- Sys.time()
     #fin - start  
     
-  }
+  #}
   
   return(snippets)
   
