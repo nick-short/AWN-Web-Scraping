@@ -183,13 +183,13 @@ get_number <- function(){
   # Determine the number of search results and assign it to the variable "num"
   num <- tryCatch({
     suppressMessages({
-      text_line <- remDr$findElement(using = 'css selector', ".nb-showing-result-count")
+      text_line <- remDr$findElement(using = 'css selector', ".search-hits__meta--total_hits")
       text_num <- as.character(text_line$getElementText())
   
       # Text takes the form of "Showing 1-X of Y Results" where Y, the desired
       # number, is the fourth word. Extract Y, then remove commas and convert to
       # numeric format
-      num <- unlist(str_split(text_num, " "))[4]
+      num <- unlist(str_split(text_num, " "))[1]
       num <- as.numeric(str_remove_all(num, ","))
       num
     })
@@ -211,7 +211,7 @@ get_snippets <- function(num, tot_results){
   cap <- min(num, tot_results, na.rm = TRUE)
   snippets <- rep(NA, cap)
   count <- 1
-  rpp <- 50 # Define number of results per page
+  rpp <- 10 # Define number of results per page
   
   # Re-sort so that the best matches are displayed first
   #sort_dropdown <- remDr$findElement(using='css selector', "#result-sort")
@@ -233,9 +233,7 @@ get_snippets <- function(num, tot_results){
   if (cap <= rpp) {
     
     for(j in 1:cap) {
-      #print(j)
-      #css <- paste("li:nth-child(", j, ") .preview", sep = "")
-      css <- paste("search-hits__hit--", j, ".preview-dynamic", sep = "")
+      css <- paste("#search-hits__hit--", j, " .preview-dynamic", sep = "")
       text_box <- remDr$findElement(using = 'css selector', css)
       text_snippet <- as.character(text_box$getElementText())
       #print(text_snippet)
@@ -253,7 +251,7 @@ get_snippets <- function(num, tot_results){
     for(k in 1:(num_floor)) {
       
       for(j in 1:rpp) {
-        css <- paste("li:nth-child(", j, ") .preview", sep = "")
+        css <- paste("#search-hits__hit--", j, " .preview-dynamic", sep = "")
         text_box <- remDr$findElement(using = 'css selector', css)
         text_snippet <- as.character(text_box$getElementText())
         snippets[count] <- text_snippet
@@ -277,7 +275,7 @@ get_snippets <- function(num, tot_results){
     # The last page will contain (num %% rpp) results
     
     for(l in 1:(num %% rpp)) {
-      css <- paste("li:nth-child(", l, ") .preview", sep = "")
+      css <- paste("#search-hits__hit--", j, " .preview-dynamic", sep = "")
       text_box <- remDr$findElement(using = 'css selector', css)
       text_snippet <- as.character(text_box$getElementText())
       snippets[count] <- text_snippet
