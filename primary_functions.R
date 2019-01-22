@@ -342,8 +342,8 @@ execute_queries <- function(file, nsnip = NULL){
       start_time <- Sys.time()
     }
     
-    # Every tenth observation, and on the last observation, save results
-    if ((i %% 5 == 0) | i == length(urls)){
+    # Every third observation, and on the last observation, save results
+    if ((i %% 3 == 0) | i == length(urls)){
       if (exists("timestamps")){
         if (exists("snippets")){save(urls, hits, snippets, timestamps, file = file)} else{save(urls, hits, timestamps, file = file)}} else {
         if (exists("snippets")){save(urls, hits, snippets, file = file)} else{save(urls, hits, file = file)}}
