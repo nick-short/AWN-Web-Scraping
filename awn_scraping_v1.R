@@ -172,8 +172,8 @@ new_filenames <- c("drones_snippets.RData", "autonomous_cars_snippets.RData", "e
                    "cloud_computing_snippets.RData", "solar_tech_snippets.RData", "smartphones_snippets.RData", 
                    "3D_printing_snippets.RData")
 
-generate_datafiles(test_words = new_terms, files = new_filenames, nsnip = 100, first_month = "Jan", 
-                   first_year = 2000)
+#generate_datafiles(test_words = new_terms, files = new_filenames, nsnip = 100, first_month = "Jan", 
+#                   first_year = 2000)
 
 remDr <- get_awn_session()
 
@@ -182,4 +182,30 @@ execute_queries(file = "cloud_computing_snippets.RData", nsnip = 50)
 load(file = "cloud_computing_snippets.RData")
 urls[1]
 remDr$navigate(urls[1])
+remDr$close()
+
+## Individual Cloud Computing Term Hits
+cloud_terms <- list(c("cloud computing"), c("cloud technology"), c("cloud resources"), c("cloud storage"),
+                      c("software as a service"), c("cloud applications"))
+
+cloud_filenames <- c("cloud_computing_term.RData", "cloud_technology_term.RData", "cloud_resources_term.RData", 
+                   "cloud_storage_term.RData", "software_as_a_service_term.RData", "cloud_applications_term.RData")
+
+#generate_datafiles(test_words = cloud_terms, files = cloud_filenames, nsnip = NULL, first_month = "Jan", 
+#                   first_year = 2000)
+
+remDr <- get_awn_session()
+
+execute_queries(file = "cloud_computing_term.RData", nsnip = 0)
+execute_queries(file = "cloud_technology_term.RData", nsnip = 0)
+execute_queries(file = "cloud_resources_term.RData", nsnip = 0)
+execute_queries(file = "cloud_storage_term.RData", nsnip = 0)
+execute_queries(file = "software_as_a_service_term.RData", nsnip = 0)
+execute_queries(file = "cloud_applications_term.RData", nsnip = 0)
+
+load(file = "cloud_computing_term.RData")
+
+### RUN THIS LINE IN TERMINAL ONCE DOCKER IS ACTIVATED!!!
+#docker run -d -p 4445:4444 selenium/standalone-chrome
+
 remDr$close()

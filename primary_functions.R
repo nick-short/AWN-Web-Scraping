@@ -1,7 +1,6 @@
 ## This function will format the provided search 'words' by substituting "+" for
 ## white space
 
-#format_words <- function(terms){return(as.character(sapply(X = terms, FUN = function(y){y <- gsub(" ", "+", y, fixed = TRUE)})))}
 format_words <- function(terms){return(as.character(sapply(X = terms, FUN = function(y){y <- gsub(" ", "%20", y, fixed = TRUE)})))}
 
 ## This function will take a vector of search words and create a single string
@@ -11,8 +10,9 @@ make_string <- function(word_vector){
   rep_str <- "%22"
   word_vector <- paste(rep_str, word_vector, rep_str, sep = "")
   word_string <- word_vector[1]
-  #for(i in 2:length(word_vector)) {word_string <- paste(word_string, word_vector[i], sep = "+%7C+")}
-  for(i in 2:length(word_vector)) {word_string <- paste(word_string, word_vector[i], sep = "%20%7C%20")}
+  if(length(word_vector) > 1) {
+    for(i in 2:length(word_vector)) {word_string <- paste(word_string, word_vector[i], sep = "%20%7C%20")}
+  }
   return(word_string)
 }
 
@@ -100,8 +100,14 @@ count_data <- function(beg_month, beg_year, end_month, end_year){
 
 get_awn_session <- function(test_url = NULL) {
   if(is.null(test_url)){test_url <- "https://infoweb-newsbank-com.stanford.idm.oclc.org/resources/search/nb?p=AWNB&b=results&action=search&fld0=YMD_date&val0=Jan+1980&bln1=AND&fld1=YMD_date&val1=&sort=YMD_date%3AD"}
-  driver <- rsDriver()
-  remDr <- driver[["client"]]
+  remDr <- RSelenium::remoteDriver(remoteServerAddr = "localhost",
+                                   port = 4445L,
+                                   browserName = "chrome")
+  #remDr$open()
+  #driver <- rsDriver(port=4445L,browser="chrome")
+  #remDr <- driver$client
+  ##driver <- rsDriver()
+  ##remDr <- driver[["client"]]
   remDr$navigate(test_url)
   return(remDr)
 }
@@ -144,7 +150,7 @@ generate_datafiles <- function(test_words, files, nsnip = NULL, first_month = NU
   
   ## Set default values if not passed to function
   if(is.null(first_month)){first_month = "Jan"}
-  if(is.null(last_month)){last_month = "Sep"}
+  if(is.null(last_month)){last_month = "Dec"}
   if(is.null(first_year)){first_year = 1985}
   if(is.null(last_year)){last_year = 2018}
   
@@ -234,15 +240,22 @@ get_snippets <- function(num, tot_results){
     
     for(j in 1:cap) {
       css <- paste("#search-hits__hit--", j, " .preview-dynamic", sep = "")
-      text_box <- remDr$findElement(using = 'css selector', css)
-      text_snippet <- as.character(text_box$getElementText())
-      #print(text_snippet)
-      snippets[count] <- text_snippet
-      count <- count + 1
+      
+      text_box <- tryCatch({
+        suppressMessages({
+          text_box <- remDr$findElement(using = 'css selector', css)
+          text_snippet <- as.character(text_box$getElementText())
+          #print(text_snippet)
+          snippets[count] <- text_snippet
+          count <- count + 1
+          delay_time <- abs(rnorm(1,0,0.1))
+        })
+      }, error = function(e) {0}
+      )
       delay_time <- abs(rnorm(1,0,0.1))
       #print(delay_time)
       pause(delay_time)
-    }
+      }
     
   #} else {
     
@@ -327,7 +340,7 @@ execute_queries <- function(file, nsnip = NULL){
     hits$count[i] <- tot_results
   
     # If 'snippets' is included in 'file', scrape snippets too      
-    if (exists("snippets")){
+    if (exists("snippets") & nsnip > 0){
       
       if (tot_results > 0){ # If total results is positive, scrape
         
@@ -352,7 +365,7 @@ execute_queries <- function(file, nsnip = NULL){
     # Pause before submitting another query.  At the moment, the pause is normally
     # distributed around 30 seconds, with a SD of 5 seconds.
     
-    pause(abs(rnorm(1,30,5)))
+    pause(abs(rnorm(1,10,2)))
     
   }
   
