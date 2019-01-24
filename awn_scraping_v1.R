@@ -151,40 +151,9 @@ hits <- spread(hits, key = "tech_class", value = "count")
 write_csv(hits, path = "pilot_alldata.csv")
 
 
-## Attempt to Scrape for Snippets Again
 
-new_terms <- list(c("drone","unmanned aerial vehicle","UAV"),
-              c("driverless","autonomous car","self-driving car", "autonomous cars",
-                "self-driving cars","selfdriving car","selfdriving cars",
-                "self-driving truck","self-driving trucks"),
-              c("electric car","electric vehicle","electric cars","electric vehicles",
-                "electric hybrid","lithium ion battery","lithium ion batteries",
-                "electric aircraft","liion batteries"),
-              c("cloud computing","cloud technology", "cloud resources","cloud storage",
-                "software as a service","cloud applications"),
-              c("solar panels","solar cells","solar electricity","solar inverter",
-                "solar power","solar cell","solar panel","photovoltaic"),
-              c("smartphone","smart phone","iPhone","mobile internet","smart phones",
-                "smartphones","samsung galaxy"),
-              c("3D printing","additive manufacturing","inkjet bioprinting"))
+#### Individual Cloud Computing Term Hits Scraping ####
 
-new_filenames <- c("drones_snippets.RData", "autonomous_cars_snippets.RData", "electric_cars_snippets.RData", 
-                   "cloud_computing_snippets.RData", "solar_tech_snippets.RData", "smartphones_snippets.RData", 
-                   "3D_printing_snippets.RData")
-
-#generate_datafiles(test_words = new_terms, files = new_filenames, nsnip = 100, first_month = "Jan", 
-#                   first_year = 2000)
-
-remDr <- get_awn_session()
-
-execute_queries(file = "cloud_computing_snippets.RData", nsnip = 50)
-
-load(file = "cloud_computing_snippets.RData")
-urls[1]
-remDr$navigate(urls[1])
-remDr$close()
-
-## Individual Cloud Computing Term Hits
 cloud_terms <- list(c("cloud computing"), c("cloud technology"), c("cloud resources"), c("cloud storage"),
                       c("software as a service"), c("cloud applications"))
 
@@ -203,7 +172,7 @@ execute_queries(file = "cloud_storage_term.RData", nsnip = 0)
 execute_queries(file = "software_as_a_service_term.RData", nsnip = 0)
 execute_queries(file = "cloud_applications_term.RData", nsnip = 0)
 
-load(file = "cloud_computing_term.RData")
+load(file = "cloud_applications_term.RData")
 
 ### RUN THIS LINE IN TERMINAL ONCE DOCKER IS ACTIVATED!!!
 #docker run -d -p 4445:4444 selenium/standalone-chrome

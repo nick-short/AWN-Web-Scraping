@@ -103,7 +103,7 @@ get_awn_session <- function(test_url = NULL) {
   remDr <- RSelenium::remoteDriver(remoteServerAddr = "localhost",
                                    port = 4445L,
                                    browserName = "chrome")
-  #remDr$open()
+  remDr$open()
   #driver <- rsDriver(port=4445L,browser="chrome")
   #remDr <- driver$client
   ##driver <- rsDriver()
@@ -252,9 +252,9 @@ get_snippets <- function(num, tot_results){
         })
       }, error = function(e) {0}
       )
-      delay_time <- abs(rnorm(1,0,0.1))
+      #delay_time <- abs(rnorm(1,0,0.1))
       #print(delay_time)
-      pause(delay_time)
+      #pause(delay_time)
       }
     
   #} else {
