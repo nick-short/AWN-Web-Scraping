@@ -407,3 +407,32 @@ stitch_hits <- function(filelist, basefile = NULL, mvavg_win = NULL){
       
   return(results)
 }
+
+save_snippets_csv <- function(f, num_snip, p) {
+  load(file = f)
+  snips <- snippets
+  
+  end_month <- NA
+  if(length(snips) == 225) {
+    end_month <- "Sep"
+  } else if(length(snips) == 228) {
+    end_month <- "Dec"
+  }
+  
+  df <- count_data("Jan", 2000, end_month, 2018)
+  
+  snip_df <- as.data.frame(matrix(nrow = length(snips), ncol = (num_snip + 1) ))
+  
+  snip_df[,1] = df$date
+  
+  for(i in 1:length(snips)) {
+    if(length(snips[[i]]) > 0) {
+      for(j in 1:length(snips[[i]])) {
+        snip_df[i,(j + 1)] = snips[[i]][j]
+      }
+    }
+  }
+  
+  write_csv(snip_df, path = p)
+  
+}

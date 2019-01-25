@@ -65,20 +65,41 @@ remDr <- get_awn_session()
 
 
 ##### Scrape here #####
+
+# Already done #
 execute_queries(file = "cloud_computing_snippets.RData", nsnip = 50)
+execute_queries(file = "autonomous_cars_snippets.RData", nsnip = 50)
+execute_queries(file = "electric_cars_snippets.RData", nsnip = 50)
+execute_queries(file = "drones_snippets.RData", nsnip = 50)
+execute_queries(file = "solar_tech_snippets.RData", nsnip = 50)
+execute_queries(file = "smartphones_snippets.RData", nsnip = 50)
 
 # CURRENT #
-execute_queries(file = "autonomous_cars_snippets.RData", nsnip = 50)
+execute_queries(file = "3D_printing_snippets.RData", nsnip = 50)
 
 #######################
 
 
-
 ## Load specific file to check snippets
-load(file = "autonomous_cars_snippets.RData")
-
+load(file = "smartphones_snippets.RData")
+length(snippets)
+snippets
 
 ## Close internet environment
 remDr$close()
 
-## Save Snippets File
+### Save Snippet Files as CSVs ###
+save_snippets_csv("cloud_computing_snippets.RData", 50, 
+                  "~/Desktop/Research/Snippets_CSVs/cloud_computing_snippets.csv")
+save_snippets_csv("autonomous_cars_snippets.RData", 50, 
+                  "~/Desktop/Research/Snippets_CSVs/autonomous_cars_snippets.csv")
+save_snippets_csv("electric_cars_snippets.RData", 50, 
+                  "~/Desktop/Research/Snippets_CSVs/electric_cars_snippets.csv")
+save_snippets_csv("drones_snippets.RData", 50, 
+                  "~/Desktop/Research/Snippets_CSVs/drones_snippets.csv")
+save_snippets_csv("solar_tech_snippets.RData", 50, 
+                  "~/Desktop/Research/Snippets_CSVs/solar_tech_snippets.csv")
+save_snippets_csv("smartphones_snippets.RData", 50, 
+                  "~/Desktop/Research/Snippets_CSVs/smartphones_snippets.csv")
+save_snippets_csv("3D_printing_snippets.RData", 50, 
+                  "~/Desktop/Research/Snippets_CSVs/3D_printing_snippets.csv")
