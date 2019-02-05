@@ -91,13 +91,12 @@ remDr <- get_awn_session()
 ##### Scrape here #####
 
 # Already done #
-
-
-## IN PROGRESS ##
 execute_queries(file = "final_cloud_computing_snippets.RData", nsnip = 50)
 
-# Still to do #
+## IN PROGRESS ##
 execute_queries(file = "final_autonomous_cars_snippets.RData", nsnip = 50)
+
+# Still to do #
 execute_queries(file = "final_genomics_snippets.RData", nsnip = 50)
 execute_queries(file = "final_robotic_snippets.RData", nsnip = 50)
 execute_queries(file = "final_solar_tech_snippets.RData", nsnip = 50)
@@ -106,7 +105,7 @@ execute_queries(file = "final_solar_tech_snippets.RData", nsnip = 50)
 
 
 ## Load specific file to check snippets
-load(file = "smartphones_snippets.RData")
+load(file = "final_cloud_computing_snippets.RData")
 length(snippets)
 snippets
 
