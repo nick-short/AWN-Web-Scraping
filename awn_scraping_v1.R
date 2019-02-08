@@ -149,3 +149,7 @@ ggsave(file = "counts_by_tech_class.pdf")
 ## Spread data to wide format and save for Nick B and others to use
 hits <- spread(hits, key = "tech_class", value = "count")
 write_csv(hits, path = "pilot_alldata.csv")
+
+
+### QUERYING IN AWN ###
+#(autopilot AND (NOT airplane)) OR kitten

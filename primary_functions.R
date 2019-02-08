@@ -328,7 +328,11 @@ execute_queries <- function(file, nsnip = NULL){
   # == 1), start at the first row / URL; otherwise, start one row prior to the
   # last recorded count result
   index <- min(which(is.na(hits$count))) 
-  if(index == 1){start <- 1} else{start <- (index - 1)}
+  if(index == 1) {
+    start <- 1
+  } else {
+    start <- (index - 1)
+  }
   
   for(i in start:length(urls)) {
     
@@ -365,7 +369,7 @@ execute_queries <- function(file, nsnip = NULL){
     # Pause before submitting another query.  At the moment, the pause is normally
     # distributed around 30 seconds, with a SD of 5 seconds.
     
-    pause(abs(rnorm(1,10,2)))
+    pause(abs(rnorm(1,0,1)))
     
   }
   
@@ -411,6 +415,7 @@ stitch_hits <- function(filelist, basefile = NULL, mvavg_win = NULL){
 save_snippets_csv <- function(f, num_snip, p) {
   load(file = f)
   snips <- snippets
+  h <- hits
   
   end_month <- NA
   if(length(snips) == 225) {
@@ -421,18 +426,113 @@ save_snippets_csv <- function(f, num_snip, p) {
   
   df <- count_data("Jan", 2000, end_month, 2018)
   
-  snip_df <- as.data.frame(matrix(nrow = length(snips), ncol = (num_snip + 1) ))
+  snip_df <- as.data.frame(matrix(nrow = length(snips), ncol = (num_snip + 2) ))
   
   snip_df[,1] = df$date
+  snip_df[,2] = h$count
+  colnames(snip_df)[1] = "date"
+  colnames(snip_df)[2] = "count"
   
   for(i in 1:length(snips)) {
     if(length(snips[[i]]) > 0) {
       for(j in 1:length(snips[[i]])) {
-        snip_df[i,(j + 1)] = snips[[i]][j]
+        snip_df[i,(j + 2)] = snips[[i]][j]
       }
     }
   }
   
   write_csv(snip_df, path = p)
   
+}
+
+create_individual_term_df <- function(terms) {
+  term_list = list()
+  filenames = c()
+  for(i in 1:length(terms)) {
+    t = terms[i]
+    vec = c(t)
+    term_list[[i]] = vec
+    f = paste(gsub(" ", "_", t, fixed = TRUE), "term.RData", sep = "_")
+    filenames = c(filenames, f)
+  }
+  
+  generate_datafiles(test_words = terms, files = filenames, 
+                     nsnip = NULL, first_month = "Jan", first_year = 2000)
+  
+  for(f in filenames) {
+    load(f)
+    if(is.na(hits[nrow(hits), "count"])){
+      execute_queries(file = f, nsnip = 0)
+    }
+  }
+  
+  col_names = c()
+  for(i in 1:length(filenames)) {
+    f = filenames[i]
+    load(file = f)
+    t = gsub(" ", "_", terms[i], fixed = TRUE)
+    col_names[i] = paste(t, "count", sep = "_")
+    colnames(hits)[which(colnames(hits) == "count")] = col_names[i]
+    nam = paste("hits", i, sep = "")
+    assign(nam, hits)
+  }
+  
+  term_hits <- left_join(hits1,hits2,by = c("date"))
+  
+  for(j in 3:length(filenames)) {
+    term_hits <- left_join(term_hits, get(paste("hits", j, sep = "")), by = c("date"))
+  }
+  
+  tot = rep(0, nrow(term_hits))
+  for(k in 1:length(col_names)) {
+    tot = tot + term_hits[,(k + 1)]
+  }
+  term_hits$total_count = tot
+  
+  for(l in 1:length(terms)) {
+    term_hits[,paste("pct", gsub(" ", "_", terms[l], fixed = TRUE), sep = "_")] = (term_hits[, col_names[l]]) / term_hits$total_count
+  }
+  
+  return(term_hits)
+}
+
+add_line <- function(t, df, prop) {
+  if(prop) {
+    geom_line(aes(x = date, y = get(paste("pct", gsub(" ", "_", t, fixed = TRUE), sep = "_")), col = t), data = df, size = 0.3)
+  } else {
+    geom_line(aes(x = date, y = get(paste(gsub(" ", "_", t, fixed = TRUE), "count", sep = "_")), col = t), data = df, size = 0.3)
+  }
+}
+
+
+create_individual_term_plot <- function(term_hits, terms, prop) {
+  all_colors = c("#000000", "#FF0000", "#0000FF", "#00FF00", "#FF9933", "#990099", 
+             "#993300", "#FF6699", "#33CCFF", "#0000CC", "#663300", "#666666", 
+             "#00FFCC", "#006600", "#999900", "#FF6600", "#9966CC", "#CC0033", 
+             "#6633FF", "#006699", "#669933", "#FF33FF", "#333333", "#CC3300", 
+             "#3300CC", "#660099")
+  colors = all_colors[1:length(terms)]
+  
+  p = ggplot(term_hits) + add_line(terms[1], term_hits, prop) +
+    add_line(terms[2], term_hits, prop) + add_line(terms[3], term_hits, prop) + 
+    add_line(terms[4], term_hits, prop) + add_line(terms[5], term_hits, prop) + add_line(terms[6], term_hits, prop) + 
+    add_line(terms[7], term_hits, prop) + add_line(terms[8], term_hits, prop) + add_line(terms[9], term_hits, prop) + 
+    add_line(terms[10], term_hits, prop) + add_line(terms[11], term_hits, prop) + add_line(terms[12], term_hits, prop) + 
+    add_line(terms[13], term_hits, prop) + add_line(terms[14], term_hits, prop) + add_line(terms[15], term_hits, prop) + 
+    add_line(terms[16], term_hits, prop) + add_line(terms[17], term_hits, prop) + add_line(terms[18], term_hits, prop) + 
+    add_line(terms[19], term_hits, prop) + add_line(terms[20], term_hits, prop) + add_line(terms[21], term_hits, prop) + 
+    add_line(terms[22], term_hits, prop) + add_line(terms[23], term_hits, prop) + add_line(terms[24], term_hits, prop) + 
+    add_line(terms[25], term_hits, prop) + add_line(terms[26], term_hits, prop) +
+    scale_colour_manual("", breaks = terms[1:length(terms)], values = colors[1:length(terms)]) + 
+    xlab("Date")
+  
+  if(prop) {
+    p = p + ylab("Proportion") +
+      labs(title = "Proportion of Cloud Computing Query Monthly Hits across Terms")
+  } else {
+    p = p + ylab("Total") + 
+      labs(title = "Total Number of Cloud Computing Query Monthly Hits across Terms")
+  }
+  
+  return(p)
 }

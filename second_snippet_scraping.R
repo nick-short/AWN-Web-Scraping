@@ -80,6 +80,9 @@ final_filenames <- c("final_autonomous_cars_snippets.RData", "final_cloud_comput
 #generate_datafiles(test_words = final_terms, files = final_filenames, nsnip = 100, first_month = "Jan", 
 #                   first_year = 2000)
 
+generate_datafiles(test_words = list(c("solar panels","solar cells","solar electricity","solar inverter",
+                                       "solar power","solar cell","solar panel","photovoltaic", "solar")), 
+                   files = c("final_solar_tech_snippets.RData"), nsnip = 100, first_month = "Jan", first_year = 2000)
 
 ### RUN THIS LINE IN TERMINAL ONCE DOCKER IS ACTIVATED TO ACTIVATE ENVIRONMENT!!!
 #docker run -d -p 4445:4444 selenium/standalone-chrome
@@ -92,20 +95,21 @@ remDr <- get_awn_session()
 
 # Already done #
 execute_queries(file = "final_cloud_computing_snippets.RData", nsnip = 50)
-
-## IN PROGRESS ##
 execute_queries(file = "final_autonomous_cars_snippets.RData", nsnip = 50)
-
-# Still to do #
 execute_queries(file = "final_genomics_snippets.RData", nsnip = 50)
 execute_queries(file = "final_robotic_snippets.RData", nsnip = 50)
+
+## IN PROGRESS ##
 execute_queries(file = "final_solar_tech_snippets.RData", nsnip = 50)
+
+# Still to do #
 
 #######################
 
 
 ## Load specific file to check snippets
-load(file = "final_cloud_computing_snippets.RData")
+load(file = "final_solar_tech_snippets.RData")
+hits
 length(snippets)
 snippets
 
@@ -123,3 +127,12 @@ save_snippets_csv("final_robotic_snippets.RData", 50,
                   "~/Desktop/Research/Final_Snippets_CSVs/final_robotic_snippets.csv")
 save_snippets_csv("final_solar_tech_snippets.RData", 50, 
                   "~/Desktop/Research/Final_Snippets_CSVs/final_solar_tech_snippets.csv")
+
+save_snippets_csv("electric_cars_snippets.RData", 50, 
+                  "~/Desktop/Research/Final_Snippets_CSVs/electric_cars_snippets.csv")
+save_snippets_csv("drones_snippets.RData", 50, 
+                  "~/Desktop/Research/Final_Snippets_CSVs/drones_snippets.csv")
+save_snippets_csv("smartphones_snippets.RData", 50, 
+                  "~/Desktop/Research/Final_Snippets_CSVs/smartphones_snippets.csv")
+save_snippets_csv("3D_printing_snippets.RData", 50, 
+                  "~/Desktop/Research/Final_Snippets_CSVs/3D_printing_snippets.csv")
