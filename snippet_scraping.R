@@ -73,8 +73,6 @@ execute_queries(file = "electric_cars_snippets.RData", nsnip = 50)
 execute_queries(file = "drones_snippets.RData", nsnip = 50)
 execute_queries(file = "solar_tech_snippets.RData", nsnip = 50)
 execute_queries(file = "smartphones_snippets.RData", nsnip = 50)
-
-# CURRENT #
 execute_queries(file = "3D_printing_snippets.RData", nsnip = 50)
 
 #######################
@@ -94,12 +92,12 @@ save_snippets_csv("cloud_computing_snippets.RData", 50,
 save_snippets_csv("autonomous_cars_snippets.RData", 50, 
                   "~/Desktop/Research/Snippets_CSVs/autonomous_cars_snippets.csv")
 save_snippets_csv("electric_cars_snippets.RData", 50, 
-                  "~/Desktop/Research/Snippets_CSVs/electric_cars_snippets.csv")
+                  "~/Desktop/Research/Final_Snippets_CSVs/electric_cars_snippets.csv")
 save_snippets_csv("drones_snippets.RData", 50, 
-                  "~/Desktop/Research/Snippets_CSVs/drones_snippets.csv")
+                  "~/Desktop/Research/Final_Snippets_CSVs/drones_snippets.csv")
 save_snippets_csv("solar_tech_snippets.RData", 50, 
                   "~/Desktop/Research/Snippets_CSVs/solar_tech_snippets.csv")
 save_snippets_csv("smartphones_snippets.RData", 50, 
-                  "~/Desktop/Research/Snippets_CSVs/smartphones_snippets.csv")
+                  "~/Desktop/Research/Final_Snippets_CSVs/smartphones_snippets.csv")
 save_snippets_csv("3D_printing_snippets.RData", 50, 
-                  "~/Desktop/Research/Snippets_CSVs/3D_printing_snippets.csv")
+                  "~/Desktop/Research/Final_Snippets_CSVs/3D_printing_snippets.csv")

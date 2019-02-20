@@ -65,7 +65,6 @@ create_individual_term_plot(cloud_term_hits, cloud_terms, TRUE)
 
 create_individual_term_plot(cloud_term_hits, cloud_terms, FALSE)
 
-
 write_csv(cloud_term_hits, "~/Desktop/Research/updated_cloud_term_hits.csv")
 
 remDr$close()
