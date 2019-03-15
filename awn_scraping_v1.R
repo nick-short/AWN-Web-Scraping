@@ -72,19 +72,24 @@ remDr <- get_awn_session()
 
 ## Load each data file, and scrape using stored URLs.  Set 'nsnip' to the number
 ## of snippets to be returned, or the function will only scrape hits.
-execute_queries(file = "drones.RData") # Done
 execute_queries(file = "autonomous_cars.RData") # Done
-execute_queries(file = "electric_cars.RData") # Done
 execute_queries(file = "cloud_computing.RData") # Done
 execute_queries(file = "solar_tech.RData") # Done
-execute_queries(file = "smartphones.RData") # Done
-execute_queries(file = "3D_printing.RData") # Done
+
+### NOT DONE!!!
+execute_queries(file = "drones.RData")
+execute_queries(file = "electric_cars.RData")
+execute_queries(file = "smartphones.RData")
+execute_queries(file = "3D_printing.RData")
 
 ## Get baseline hits (for normalization) if needed
-urls <- generate_baseline_urls(beg_month = "Jan", beg_year = 1985, end_month = "Sep", end_year = 2018)
-hits <- count_data(beg_month = "Jan", beg_year = 1985, end_month = "Sep", end_year = 2018)
-save(urls, hits, file = "baseline.RData")
-execute_queries(file = "baseline.RData")
+urls <- generate_baseline_urls(beg_month = "Jan", beg_year = 2000, end_month = "Dec", end_year = 2018)
+hits <- count_data(beg_month = "Jan", beg_year = 2000, end_month = "Dec", end_year = 2018)
+save(urls, hits, file = "totals.RData")
+execute_queries(file = "totals.RData")
+
+load("totals.RData")
+hits
 
           ## Conduct tests for scraping time if desired
 
@@ -150,6 +155,57 @@ ggsave(file = "counts_by_tech_class.pdf")
 hits <- spread(hits, key = "tech_class", value = "count")
 write_csv(hits, path = "pilot_alldata.csv")
 
-
 ### QUERYING IN AWN ###
 #(autopilot AND (NOT airplane)) OR kitten
+
+library(readr)
+X3D_printing <- read_csv("~/Desktop/Econ Hit CSVs/3D_printing_snippets.csv")
+drones <- read_csv("~/Desktop/Econ Hit CSVs/drones_snippets.csv")
+electric_cars <- read_csv("~/Desktop/Econ Hit CSVs/electric_cars_snippets.csv")
+auto_cars <- read_csv("~/Desktop/Econ Hit CSVs/final_autonomous_cars_snippets.csv")
+cloud_comp <- read_csv("~/Desktop/Econ Hit CSVs/final_cloud_computing_snippets.csv")
+genomics <- read_csv("~/Desktop/Econ Hit CSVs/final_genomics_snippets.csv")
+robotic <- read_csv("~/Desktop/Econ Hit CSVs/final_robotic_snippets.csv")
+solar_tech <- read_csv("~/Desktop/Econ Hit CSVs/final_solar_tech_snippets.csv")
+smartphones <- read_csv("~/Desktop/Econ Hit CSVs/smartphones_snippets.csv")
+
+total_hits = hits
+colnames(total_hits)[2] = "total_articles"
+
+load("3D_printing.RData")
+total_hits$printing_3D_hits = c(X3D_printing$count, hits$count)
+
+load("drones.RData")
+total_hits$drones_hits = c(drones$count, hits$count)
+
+load("electric_cars.RData")
+total_hits$electric_cars_hits = c(electric_cars$count, hits$count)
+total_hits$autonomous_vehicles_hits = auto_cars$count
+total_hits$cloud_computing_hits = cloud_comp$count
+total_hits$genomics_hits = genomics$count
+total_hits$robotics_hits = robotic$count
+total_hits$solar_tech_hits = solar_tech$count
+
+load("smartphones.RData")
+total_hits$smartphones_hits = c(smartphones$count, hits$count)
+
+fill_terms <- list(c("drone","unmanned aerial vehicle","UAV"),
+                    c("electric car","electric vehicle","electric cars","electric vehicles",
+                      "electric hybrid","lithium ion battery","lithium ion batteries",
+                      "electric aircraft","liion batteries"),
+                    c("smartphone","smart phone","iPhone","mobile internet","smart phones",
+                      "smartphones","samsung galaxy"),
+                    c("3D printing","additive manufacturing","inkjet bioprinting"))
+
+fill_filenames <- c("drones.RData",
+               "electric_cars.RData",
+               "smartphones.RData",
+               "3D_printing.RData")
+
+generate_datafiles(test_words = fill_terms, files = fill_filenames, first_month = "Oct", first_year = "2018", 
+                   last_month = "Dec", last_year = "2018")
+
+execute_queries(file = "drones.RData", nsnip = 0)
+execute_queries(file = "electric_cars.RData", nsnip = 0)
+execute_queries(file = "smartphones.RData", nsnip = 0)
+execute_queries(file = "3D_printing.RData", nsnip = 0)
